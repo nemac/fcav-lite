@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useDebugValue, useRef } from "react"
+import React, { useState, useEffect, useDebugValue, useRef, useContext } from "react"
 import L from "leaflet"
 import config from "./config"
 import {
@@ -8,7 +8,8 @@ import {
 import { Grid } from "@material-ui/core"
 import AppBar from "@material-ui/core/AppBar"
 import Toolbar from "@material-ui/core/Toolbar"
-import nemacLogo from "./nemac_logo_white.png"
+import nemacLogoWhite from "./nemac_logo_white.png"
+import nemacLogoBlack from "./nemac_logo_black.png"
 import FormControl from '@material-ui/core/FormControl'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -18,19 +19,17 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
-import Typography from '@material-ui/core/Typography'
 import Slider from '@material-ui/core/Slider'
 import { makeStyles } from '@material-ui/core/styles'
-import Icon from '@material-ui/core/Icon'
 import Button from '@material-ui/core/Button'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import {isLeapYear, toDate, toWMSDate} from "./datemanagement"
+import { CustomThemeContext } from './CustomThemeProvider'
 
 // Map Defaults
 const center = [35, -82]
 const zoom = 13
-
 
 function useStateWithLabel(initialValue, name) {
   const [value, setValue] = useState(initialValue)
@@ -58,7 +57,8 @@ const getLayerRangeByDate = (startDate, endDate, wmsLayers) => {
 
 
 export function App() {
-
+  const {setTheme } = useContext(CustomThemeContext)
+  const [darkMode, setDarkMode] = useStateWithLabel(true);
   // Initialize Material UI styles
   const useStyles = makeStyles({
     root: {
@@ -173,6 +173,14 @@ export function App() {
       leafletLayer.bringToBack()
       leafletLayer.setOpacity(1)
       basemapRef.current = leafletLayer
+      //set theme based on basemaps
+      setTheme(newBasemap.theme)
+      if(newBasemap.theme === 'dark'){
+        setDarkMode(true);
+      }
+      else{
+        setDarkMode(false);
+      }
       return () => {
         map.removeLayer(basemapRef.current)
       }
@@ -219,7 +227,7 @@ export function App() {
     return (
       <Button
         letiant="contained"
-        color="primary"
+        color="secondary"
         className={classes.button}
         startIcon={ animating ? <StopIcon/> : <PlayArrowIcon />}
         onClick={ () => { setAnimating(!animating) } }
@@ -300,22 +308,24 @@ export function App() {
 
   function TopBar () {
     return (
+      //<ThemeProvider theme={fcavtheme}>
        <Grid item xs={12}>
         <AppBar
-          id='menu'
+          //id='menu'
           position="static"
-          color="#424242"
 
-          style={{ zIndex: '0', flexWrap: 'flex', flexDirection: 'column', backgroundColor: "#424242"}}
+
+          style={{ zIndex: '0', flexWrap: 'flex', flexDirection: 'column'}}
         >
           <Toolbar>
-            <img src={nemacLogo} width="150" alt="your mom"></img>
+            <img src={ darkMode ? nemacLogoWhite : nemacLogoBlack} width="150" alt="your mom"></img>
             <BasemapSelect/>
             <DateRangePicker/>
             <AnimateBtn />
           </Toolbar>
         </AppBar>
       </Grid>
+      //</ThemeProvider>
     )
   }
 
