@@ -26,6 +26,8 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import {isLeapYear, toDate, toWMSDate} from "./datemanagement"
 import { CustomThemeContext } from './CustomThemeProvider'
+import "leaflet-loading"
+import 'leaflet-loading/src/Control.Loading.css'
 
 // Map Defaults
 const center = [35, -82]
@@ -335,6 +337,7 @@ export function App() {
       <TopBar/>
       <Grid item xs={12}>
         <MapContainer
+          loadingControl={true}
           center={center}
           zoom={zoom}
           style={{ height: "90vh" }}
