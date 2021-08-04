@@ -28,6 +28,8 @@ import {isLeapYear, toDate, toWMSDate} from "./datemanagement"
 import { CustomThemeContext } from './CustomThemeProvider'
 import "leaflet-loading"
 import 'leaflet-loading/src/Control.Loading.css'
+import {geosearch} from 'esri-leaflet-geocoder'
+import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
 
 // Map Defaults
 const center = [35, -82]
@@ -68,6 +70,8 @@ export function App() {
     },
   })
   const classes = useStyles()
+
+
 
   const [animating, setAnimating] = useStateWithLabel(false)
 
@@ -145,7 +149,8 @@ export function App() {
   function MapController () {
 
     const map = useMap()
-
+    const search = geosearch()
+    search.addTo(map);
     // Clear map utility
     const clearMap = () => {
       console.log("Clearing map...")
