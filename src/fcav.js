@@ -10,6 +10,7 @@ import AppBar from "@material-ui/core/AppBar"
 import Toolbar from "@material-ui/core/Toolbar"
 import nemacLogoWhite from "./nemac_logo_white.png"
 import nemacLogoBlack from "./nemac_logo_black.png"
+import forwarn2Legend from "./forwarn2-legend.png"
 import FormControl from '@material-ui/core/FormControl'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -86,10 +87,12 @@ export function App() {
   const basemapRef = useRef()
 
   // Layers
+  const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
+  const productsList = config.productsList;
   const [wmsLayers, setWmsLayers] = useStateWithLabel(config.juliandates.map(jd => {
     const date = toDate(parseInt(jd) + 7, 2020) // 7 day offset
     const wmsdate = toWMSDate(date)
-    const o = config.wms_template(wmsdate)
+    const o = config.wms_template(wmsdate, productIndex)
     o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
     o.date = date
     return o
@@ -98,6 +101,14 @@ export function App() {
   const [layerRange, setLayerRange] = useStateWithLabel(
     getLayerRangeByDate(startDate, endDate, wmsLayers), "layerRange"
   )
+
+  //theme switching
+  const themesList = config.themesList;
+  const [themeIndex, setThemeIndex] = useStateWithLabel(0, "themeIndex")
+
+  const [mapControls, setMapControls] = useStateWithLabel([], "mapControls")
+  const [isInitialRender, setIsInitialRender] = useStateWithLabel(true, "initialrender");
+
 
   // State change and event handlers
 
@@ -134,6 +145,26 @@ export function App() {
     let index = event.target.value
     setBasemapIndex(index)
   }
+  const onThemeChange = (event) => {
+    let index = event.target.value
+    setThemeIndex(index)
+  }
+
+  const onProductChange = (event) => {
+    let index = event.target.value
+    let newWMS = config.juliandates.map(jd => {
+      const date = toDate(parseInt(jd) + 7, 2020) // 7 day offset
+      const wmsdate = toWMSDate(date)
+      const o = config.wms_template(wmsdate, index)
+      o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
+      o.date = date
+      return o
+    });
+    setWmsLayers(newWMS);
+          setProductIndex(index);
+          let newLayerRange = getLayerRangeByDate(startDate, endDate, newWMS)
+          setLayerRange(newLayerRange)
+  }
 
   const onSliderChange = (e, v) => {
     console.log('slider change')
@@ -147,10 +178,8 @@ export function App() {
   }
 
   function MapController () {
-
+  const search = geosearch()
     const map = useMap()
-    const search = geosearch()
-    search.addTo(map);
     // Clear map utility
     const clearMap = () => {
       console.log("Clearing map...")
@@ -181,17 +210,38 @@ export function App() {
       leafletLayer.setOpacity(1)
       basemapRef.current = leafletLayer
       //set theme based on basemaps
-      setTheme(newBasemap.theme)
-      if(newBasemap.theme === 'dark'){
+      //setTheme(newBasemap.theme)
+      /*if(newBasemap.theme === 'dark'){
+        setDarkMode(true);
+      }
+      else{
+        setDarkMode(false);
+      }*/
+      return () => {
+        map.removeLayer(basemapRef.current)
+      }
+    }, [basemapIndex])
+
+    // Hook: product change
+    useEffect(() => {
+      //console.log(newWMS);
+      clearMap()
+    }, [productIndex])
+
+    // Hook: Theme change
+    useEffect(() => {
+      //console.log(newWMS);
+      let chosenTheme = themesList[themeIndex]
+      chosenTheme = chosenTheme.toLowerCase()
+      console.log("chosen theme: " + chosenTheme)
+      setTheme(chosenTheme)
+      if(chosenTheme === 'dark'){
         setDarkMode(true);
       }
       else{
         setDarkMode(false);
       }
-      return () => {
-        map.removeLayer(basemapRef.current)
-      }
-    }, [basemapIndex])
+    }, [themeIndex])
 
     // Hook: date range index change
     useEffect(() => {
@@ -224,6 +274,22 @@ export function App() {
         }
       })
     }, [animating])
+
+    if(isInitialRender){ //check if initilization is complete so we don't reinitilize components
+      search.addTo(map);
+      const legend = L.control({ position: "bottomright"});
+      legend.onAdd = () => {
+          const div = L.DomUtil.create("div", "info legend");
+          div.innerHTML =
+            "<img src=" + forwarn2Legend + "" +" width=\"128.5px\" height=\"210.5px\">";
+          return div;
+        };
+    }
+
+
+    if(isInitialRender){
+      setIsInitialRender(false);
+    }
 
     return null
 
@@ -297,8 +363,8 @@ export function App() {
           Basemap
         </InputLabel>
         <Select
-          labelId="fcav-product-select-label"
-          id="fcav-product-select"
+          labelId="fcav-basemap-select-label"
+          id="fcav-basemap-select"
           value={basemapIndex}
           onChange={onBasemapChange}
           label="Product"
@@ -306,6 +372,52 @@ export function App() {
           {
             basemaps.map((basemap, index) => (
               <MenuItem key={index} value={index}>{basemap.name}</MenuItem>
+            ))
+          }
+        </Select>
+      </FormControl>
+    )
+  }
+  function ThemeSelect () {
+
+    return (
+      <FormControl letiant="outlined" style={{marginRight: 16 }}>
+        <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+          Theme
+        </InputLabel>
+        <Select
+          labelId="fcav-theme-select-label"
+          id="fcav-theme-select"
+          value={themeIndex}
+          onChange={onThemeChange}
+          label="Theme"
+        >
+          {
+            themesList.map((theme, index) => (
+              <MenuItem key={index} value={index}>{theme}</MenuItem>
+            ))
+          }
+        </Select>
+      </FormControl>
+    )
+  }
+  function ProductSelect () {
+
+    return (
+      <FormControl letiant="outlined" style={{marginRight: 16 }}>
+        <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+          Product
+        </InputLabel>
+        <Select
+          labelId="fcav-product-select-label"
+          id="fcav-product-select"
+          value={productIndex}
+          onChange={onProductChange}
+          label="Product"
+        >
+          {
+            productsList.map((product, index) => (
+              <MenuItem key={index} value={index}>{product}</MenuItem>
             ))
           }
         </Select>
@@ -328,7 +440,8 @@ export function App() {
             <img src={ darkMode ? nemacLogoWhite : nemacLogoBlack} width="150" alt="your mom"></img>
             <BasemapSelect/>
             <DateRangePicker/>
-            <AnimateBtn />
+            <ProductSelect/>
+            <ThemeSelect/>
           </Toolbar>
         </AppBar>
       </Grid>
