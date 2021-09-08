@@ -25,7 +25,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
-import {isLeapYear, toDate, toWMSDate} from "./datemanagement"
+import {isLeapYear, toDate, toWMSDate, getFWDatesForYear, getNextFWDate} from "./datemanagement"
 import { CustomThemeContext } from './CustomThemeProvider'
 import "leaflet-loading"
 import 'leaflet-loading/src/Control.Loading.css'
@@ -97,6 +97,9 @@ export function App() {
     o.date = date
     return o
   }), "wmsLayers")
+
+  const [fullWMSLayers, setFullWMSLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate), "fullWMSLayers")
+  //const [tempDate, setTempDate] = useStateWithLabel(new Date("2020-01-16"), "tempDate")
 
   const [layerRange, setLayerRange] = useStateWithLabel(
     getLayerRangeByDate(startDate, endDate, wmsLayers), "layerRange"
@@ -177,9 +180,24 @@ export function App() {
     setAnimating(!animating)
   }
 
+  function getWMSLayersYearRange(startDate, endDate){
+    let wmsLayers = [];
+    let tempDate = getNextFWDate(startDate);
+    console.log("tempdate: " + tempDate);
+    while(tempDate <= endDate){
+      const wmsdate = toWMSDate(tempDate);
+      const o = config.wms_template(wmsdate, productIndex)
+      o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
+      o.date = tempDate
+      wmsLayers.push(o);
+      tempDate = getNextFWDate(tempDate);
+    }
+    return wmsLayers;
+  }
+
   function MapController () {
   const search = geosearch()
-    const map = useMap()
+    const map = useMap() 
     // Clear map utility
     const clearMap = () => {
       console.log("Clearing map...")

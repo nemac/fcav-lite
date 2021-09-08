@@ -1,3 +1,5 @@
+import config from "./config"
+
 function isLeapYear(year)
 {
   return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
@@ -42,5 +44,37 @@ function toWMSDate(dateObj, toHyphenate = false) {
     return wmsString;
   }
 }
+function getNextFWDate(startDate){
+  let datesForYear = getFWDatesForYear(startDate.getFullYear());
+  for(let i = 0; i < datesForYear.length; i++){
+    if(startDate >= datesForYear[i]){
+      return datesForYear[i];
+    }
+  }
+  return toDate(parseInt(config.juliandates[0], startDate.getFullYear()+1));
+}
+function getFWDatesForYear(year){
+  return config.juliandates.map(jd => {
+    const date = toDate(parseInt(jd) + 7, year) // 7 day offset
+    return date
+  })
+}
 
-export {isLeapYear, toDate, toWMSDate}
+Date.prototype.isLeapYear = function() {
+    var year = this.getFullYear();
+    if((year & 3) != 0) return false;
+    return ((year % 100) != 0 || (year % 400) == 0);
+};
+
+// Get Day of Year
+Date.prototype.getDOY = function() {
+    var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    var mn = this.getMonth();
+    var dn = this.getDate();
+    var dayOfYear = dayCount[mn] + dn;
+    if(mn > 1 && this.isLeapYear()) dayOfYear++;
+    return dayOfYear;
+};
+
+
+export {isLeapYear, toDate, toWMSDate, getNextFWDate, getFWDatesForYear}
