@@ -47,7 +47,7 @@ function toWMSDate(dateObj, toHyphenate = false) {
 function getNextFWDate(startDate){
   let datesForYear = getFWDatesForYear(startDate.getFullYear());
   for(let i = 0; i < datesForYear.length; i++){
-    if(startDate >= datesForYear[i]){
+    if(datesForYear[i] >= startDate){
       return datesForYear[i];
     }
   }

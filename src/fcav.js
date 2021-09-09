@@ -78,7 +78,7 @@ export function App() {
 
   // Date State
   const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
-  const [endDate, setEndDate] = useStateWithLabel(new Date("2020-02-17"), "endDate")
+  const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
   const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex")
 
   // Basemaps
@@ -89,16 +89,16 @@ export function App() {
   // Layers
   const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
   const productsList = config.productsList;
-  const [wmsLayers, setWmsLayers] = useStateWithLabel(config.juliandates.map(jd => {
+  /*const [wmsLayers, setWmsLayers] = useStateWithLabel(config.juliandates.map(jd => {
     const date = toDate(parseInt(jd) + 7, 2020) // 7 day offset
     const wmsdate = toWMSDate(date)
     const o = config.wms_template(wmsdate, productIndex)
     o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
     o.date = date
     return o
-  }), "wmsLayers")
+  }), "wmsLayers")*/
 
-  const [fullWMSLayers, setFullWMSLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate), "fullWMSLayers")
+  const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate), "fullWMSLayers")
   //const [tempDate, setTempDate] = useStateWithLabel(new Date("2020-01-16"), "tempDate")
 
   const [layerRange, setLayerRange] = useStateWithLabel(
@@ -125,8 +125,8 @@ export function App() {
       month = "0" + month
     }
     setStartDate(date)
-    let newLayerRange = getLayerRangeByDate(date, endDate, wmsLayers)
-    setLayerRange(newLayerRange)
+    let newLayerRange = getWMSLayersYearRange(date, endDate)
+    setWmsLayers(newLayerRange)
     setDateRangeIndex(0)
   }
 
@@ -140,7 +140,8 @@ export function App() {
       month = "0" + month
     }
     setEndDate(date) //set end date state
-    setLayerRange(getLayerRangeByDate(startDate, date, wmsLayers)) //set date objects to state
+    let newLayerRange = getWMSLayersYearRange(startDate, date)
+    setWmsLayers(newLayerRange);
     setDateRangeIndex(0)
   }
 
@@ -190,6 +191,7 @@ export function App() {
       o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
       o.date = tempDate
       wmsLayers.push(o);
+      tempDate.setDate(tempDate.getDate() + 1);
       tempDate = getNextFWDate(tempDate);
     }
     return wmsLayers;
@@ -197,7 +199,7 @@ export function App() {
 
   function MapController () {
   const search = geosearch()
-    const map = useMap() 
+    const map = useMap()
     // Clear map utility
     const clearMap = () => {
       console.log("Clearing map...")
