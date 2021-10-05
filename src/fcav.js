@@ -25,12 +25,14 @@ import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import {isLeapYear, toDate, toWMSDate, getFWDatesForYear, getNextFWDate} from "./datemanagement"
 import { CustomThemeContext } from './CustomThemeProvider'
 import "leaflet-loading"
 import 'leaflet-loading/src/Control.Loading.css'
 import {geosearch} from 'esri-leaflet-geocoder'
 import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
+import {Line} from 'react-chartjs-2'
 
 // Map Defaults
 const center = [35, -82]
@@ -75,6 +77,35 @@ export function App() {
 
 
   const [animating, setAnimating] = useStateWithLabel(false)
+  const [graphOn, setGraphOn] = useStateWithLabel(false)
+  const [modisData, setModisData] = useStateWithLabel({
+  labels: ['1', '2', '3', '4', '5', '6'],
+  datasets: [
+    {
+      label: '# of Votes',
+      data: [12, 19, 3, 5, 2, 3],
+      fill: false,
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgba(255, 99, 132, 0.2)',
+    },
+  ],
+}, "MODIS CHART DATA");
+
+const [modisDataConfig, setModisDataConfig] = useStateWithLabel({
+  scales: {
+    yAxes: [
+      {
+        ticks: {
+          beginAtZero: true,
+        },
+      },
+    ],
+  },
+}, "MODIS CHART CONFIG");
+
+const [error, setError] = useState(null);
+const [isLoaded, setIsLoaded] = useState(false);
+const [items, setItems] = useState([]);
 
   // Date State
   const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
@@ -98,12 +129,12 @@ export function App() {
     return o
   }), "wmsLayers")*/
 
-  const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate), "fullWMSLayers")
+  const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
   //const [tempDate, setTempDate] = useStateWithLabel(new Date("2020-01-16"), "tempDate")
 
-  const [layerRange, setLayerRange] = useStateWithLabel(
+  /*const [layerRange, setLayerRange] = useStateWithLabel(
     getLayerRangeByDate(startDate, endDate, wmsLayers), "layerRange"
-  )
+  )*/
 
   //theme switching
   const themesList = config.themesList;
@@ -125,7 +156,7 @@ export function App() {
       month = "0" + month
     }
     setStartDate(date)
-    let newLayerRange = getWMSLayersYearRange(date, endDate)
+    let newLayerRange = getWMSLayersYearRange(date, endDate, productIndex)
     setWmsLayers(newLayerRange)
     setDateRangeIndex(0)
   }
@@ -140,7 +171,7 @@ export function App() {
       month = "0" + month
     }
     setEndDate(date) //set end date state
-    let newLayerRange = getWMSLayersYearRange(startDate, date)
+    let newLayerRange = getWMSLayersYearRange(startDate, date, productIndex)
     setWmsLayers(newLayerRange);
     setDateRangeIndex(0)
   }
@@ -156,18 +187,9 @@ export function App() {
 
   const onProductChange = (event) => {
     let index = event.target.value
-    let newWMS = config.juliandates.map(jd => {
-      const date = toDate(parseInt(jd) + 7, 2020) // 7 day offset
-      const wmsdate = toWMSDate(date)
-      const o = config.wms_template(wmsdate, index)
-      o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
-      o.date = date
-      return o
-    });
-    setWmsLayers(newWMS);
           setProductIndex(index);
-          let newLayerRange = getLayerRangeByDate(startDate, endDate, newWMS)
-          setLayerRange(newLayerRange)
+          let newProduct = getWMSLayersYearRange(startDate, endDate, index);
+          setWmsLayers(newProduct);
   }
 
   const onSliderChange = (e, v) => {
@@ -181,13 +203,13 @@ export function App() {
     setAnimating(!animating)
   }
 
-  function getWMSLayersYearRange(startDate, endDate){
+  function getWMSLayersYearRange(startDate, endDate, productIdx){
     let wmsLayers = [];
     let tempDate = getNextFWDate(startDate);
     console.log("tempdate: " + tempDate);
     while(tempDate <= endDate){
       const wmsdate = toWMSDate(tempDate);
-      const o = config.wms_template(wmsdate, productIndex)
+      const o = config.wms_template(wmsdate, productIdx)
       o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
       o.date = tempDate
       wmsLayers.push(o);
@@ -195,6 +217,15 @@ export function App() {
       tempDate = getNextFWDate(tempDate);
     }
     return wmsLayers;
+  }
+  function getChartData(lat, long){
+    const baseurl = 'https://fcav-ndvi-dev.nemac.org/tsmugl_product.cgi?args=CONUS_NDVI,' + lat + ',' + long;
+    fetch(baseurl).then((response) => response.text())
+    .then((textResponse) => console.log('response is ', textResponse))
+    .catch((error) => {
+        console.log(error);
+    });
+
   }
 
   function MapController () {
@@ -266,7 +297,7 @@ export function App() {
     // Hook: date range index change
     useEffect(() => {
       clearMap()
-      const layer = layerRange[dateRangeIndex]
+      const layer = wmsLayers[dateRangeIndex]
       console.log("new layer: ")
       console.log(layer)
       if (!map.hasLayer(layer.leafletLayer)) {
@@ -276,7 +307,7 @@ export function App() {
       layer.leafletLayer.bringToFront()
       layer.leafletLayer.setOpacity(1)
       if (animating) {
-        const newIndex = (dateRangeIndex+1) === layerRange.length ? 0 : dateRangeIndex+1
+        const newIndex = (dateRangeIndex+1) === wmsLayers.length ? 0 : dateRangeIndex+1
         const timer = setTimeout(() => {
           setDateRangeIndex(newIndex)
         }, 10000)
@@ -287,13 +318,33 @@ export function App() {
     // Hook: Animation button clicked - add all layers to the map
     useEffect(() => {
       if (!animating) { return }
-      layerRange.forEach(layer => {
+      wmsLayers.forEach(layer => {
         layer.leafletLayer.setOpacity(0)
         if (!map.hasLayer(layer.leafletLayer)) {
           map.addLayer(layer.leafletLayer)
         }
       })
     }, [animating])
+    var lat = map.getCenter().lat;
+    var lng = map.getCenter().lng;
+    /*useEffect(() => {
+    fetch('https://fcav-ndvi-dev.nemac.org/tsmugl_product.cgi?args=CONUS_NDVI,' + lat + ',' + lng)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setIsLoaded(true);
+          setItems(result);
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+  }, [graphOn])*/
+  //console.log(map.getCenter().toString())
 
     if(isInitialRender){ //check if initilization is complete so we don't reinitilize components
       search.addTo(map);
@@ -304,6 +355,14 @@ export function App() {
             "<img src=" + forwarn2Legend + "" +" width=\"128.5px\" height=\"210.5px\">";
           return div;
         };
+      legend.addTo(map);
+
+      //create loading indicator
+      var leafletLoading = L.Control.loading({
+        separate: true,
+        //position: 'topcenter'
+      });
+      leafletLoading.addTo(map);
     }
 
 
@@ -327,6 +386,17 @@ export function App() {
       >{ animating ? "Stop" : "Play" }</Button>
     )
 
+  }
+  function GraphBtn(props){
+    return(
+      <Button
+        letiant="contained"
+        color="secondary"
+        className={classes.button}
+        startIcon={ graphOn ? <StopIcon/> : <AssessmentIcon />}
+        onClick={ () => { getChartData(-78.65678578328217,35.45115625827913) } }
+      >{ graphOn ? "Hide Graph" : "Show Graph" }</Button>
+    )
   }
 
   function DateRangePicker () {
@@ -353,7 +423,7 @@ export function App() {
                 step={1}
                 marks
                 min={0}
-                max={layerRange.length-1}
+                max={wmsLayers.length-1}
                 onChangeCommitted={ onSliderChange }
               />
             </div>
@@ -462,6 +532,7 @@ export function App() {
             <DateRangePicker/>
             <ProductSelect/>
             <ThemeSelect/>
+            <GraphBtn/>
           </Toolbar>
         </AppBar>
       </Grid>
@@ -475,7 +546,7 @@ export function App() {
       <TopBar/>
       <Grid item xs={12}>
         <MapContainer
-          loadingControl={true}
+          //loadingControl={true}
           center={center}
           zoom={zoom}
           style={{ height: "90vh" }}
