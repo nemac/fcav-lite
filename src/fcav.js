@@ -82,7 +82,9 @@ export function App() {
     },
     paper: {
       position: 'absolute',
-      width: 450,
+      fontColor: "white",
+      width: '100%',
+      height: '50%',
       background: 'rgb(26, 35, 39)',
       boxShadow: 24,
       padding: 4,
@@ -93,7 +95,7 @@ export function App() {
 
 
   const [animating, setAnimating] = useStateWithLabel(false)
-  const [graphOn, setGraphOn] = useStateWithLabel(false)
+  const [graphOn, setGraphOn] = useStateWithLabel(false, "GraphOn")
   const [map, setMap] = useStateWithLabel('', "map");
   const handleGraphOpen = () => {
     var lat = map.getCenter().lat;
@@ -113,13 +115,14 @@ export function App() {
         label: '# of Votes',
         data: [],
         fill: false,
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgba(255, 99, 132, 0.2)',
+        backgroundColor: 'rgb(3, 237, 96)',
+        borderColor: 'rgba(3, 237, 96, 0.8)',
       },
     ],
   }, "MODIS CHART DATA");
 
   const [modisDataConfig, setModisDataConfig] = useStateWithLabel({
+    maintainAspectRatio: false,
     scales: {
       yAxes: [
         {
@@ -127,7 +130,8 @@ export function App() {
             beginAtZero: true,
             steps: 10,
             stepValue: 5,
-            max: 100
+            max: 100,
+            fontColor: "white"
           },
         },
       ],
@@ -252,8 +256,8 @@ export function App() {
             label: response.mugl.verticalaxis.title,
             data: parsedData,
             fill: false,
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgba(255, 99, 132, 0.2)',
+            backgroundColor: modisData.datasets[0].backgroundColor,
+            borderColor: modisData.datasets[0].borderColor,
           },
         ],
       }
@@ -284,6 +288,11 @@ export function App() {
     for(let i = 0; i < dateArr.length; i++){
       let dateSTR = dateArr[i];
       dateSTR = dateSTR.substr(0, 8);
+      let year = dateSTR.substr(0,4);
+      let month = dateSTR.substr(4, 2);
+      let day = dateSTR.substr(6, 2);
+      //console.log(year + "/" + month + "/" + day);
+      dateSTR = year + "/" + month + "/" + day;
       dateArr[i] = dateSTR;
     }
     return dateArr;
@@ -424,19 +433,32 @@ function GraphBtn(props){
   )
 }
 function GraphWindow(){
+  /*
+  <Modal className ={classes.modal}
+    open={graphOn}
+    onClose={handleGraphOpen}
+    aria-labelledby="modal-modal-title"
+    aria-describedby="modal-modal-description"
+    >
+    <Box className={classes.paper}>
+      <Line data={modisData} options={modisDataConfig} />
+    </Box>
+  </Modal>
+  */
   return(
-    <Modal className ={classes.modal}
-      open={graphOn}
-      onClose={handleGraphOpen}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-      >
-      <Box className={classes.paper}>
-        <Line data={modisData} options={modisDataConfig} />
-      </Box>
-    </Modal>
+    <Grid item xs={12}>
+    { graphOn ? <GraphData /> : null }
+    </Grid>
   )
 }
+
+const GraphData = () =>(
+
+    <Box className={classes.paper}>
+      <Line data={modisData} options={modisDataConfig} />
+    </Box>
+
+)
 
 function DateRangePicker () {
   return (
@@ -593,7 +615,6 @@ function TopBar () {
 // App
 return (
   <div>
-    <GraphWindow/>
     <Grid container>
       <TopBar/>
       <Grid item xs={12}>
@@ -601,11 +622,12 @@ return (
           //loadingControl={true}
           center={center}
           zoom={zoom}
-          style={{ height: "90vh" }}
+          style={{ height: graphOn ? "90vh" : "70vh"}}
         >
           <MapController />
         </MapContainer>
       </Grid>
+              <GraphWindow/>
     </Grid>
   </div>
 )
