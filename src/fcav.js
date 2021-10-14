@@ -82,9 +82,9 @@ export function App() {
     },
     paper: {
       position: 'absolute',
-      fontColor: "white",
+      color: "white",
       width: '100%',
-      height: '50%',
+      height: '45vh',
       background: 'rgb(26, 35, 39)',
       boxShadow: 24,
       padding: 4,
@@ -96,20 +96,34 @@ export function App() {
 
   const [animating, setAnimating] = useStateWithLabel(false)
   const [graphOn, setGraphOn] = useStateWithLabel(false, "GraphOn")
+  const [mapHeight, setMapHeight] = useStateWithLabel("90vh", "mapHeight");
   const [map, setMap] = useStateWithLabel('', "map");
   const handleGraphOpen = () => {
+    //setModisData(getChartData(-78.65678578328217,35.45115625827913));
+    //console.log(fetchChartData(-78.65678578328217,35.45115625827913));
+    setGraphOn(!graphOn);
+    //if(graphOn){
+      const mapContainer = document.querySelector(".mapContainer");
+      if(!graphOn){
+        mapContainer.style.setProperty("height", "45vh")
+      }
+      else{
+        mapContainer.style.setProperty("height", "90vh")
+      }
+              map.invalidateSize()
+    //}
+  }
+  const updateGraphDataOnClick = () => {
     var lat = map.getCenter().lat;
     var lng = map.getCenter().lng;
     console.log(lat, lng);
     if(map!=null){
       getChartData(lng,lat);
     }
-    //setModisData(getChartData(-78.65678578328217,35.45115625827913));
-    //console.log(fetchChartData(-78.65678578328217,35.45115625827913));
-    setGraphOn(!graphOn);
   }
   const [modisData, setModisData] = useStateWithLabel({
     labels: ['1', '2', '3', '4', '5', '6'],
+    coordinates: [0,0],
     datasets: [
       {
         label: '# of Votes',
@@ -245,23 +259,29 @@ export function App() {
   async function getChartData(lat, long){
     let result = fetchChartData(lat, long);
     result.then(function(response){
-      console.log("data fetch success");
-      console.log(response);
-      let parsedData = parseValuesToInts(response.mugl.data.values);
-      let xAxis = parseDatesToString(response.mugl.data.values);
-      var newModisData = {
-        labels: xAxis,
-        datasets: [
-          {
-            label: response.mugl.verticalaxis.title,
-            data: parsedData,
-            fill: false,
-            backgroundColor: modisData.datasets[0].backgroundColor,
-            borderColor: modisData.datasets[0].borderColor,
-          },
-        ],
+      if(response.mugl!=null){
+        console.log("data fetch success");
+        console.log(response);
+        let parsedData = parseValuesToInts(response.mugl.data.values);
+        let xAxis = parseDatesToString(response.mugl.data.values);
+        var newModisData = {
+          labels: xAxis,
+          coordinates: [lat,long],
+          datasets: [
+            {
+              label: response.mugl.verticalaxis.title,
+              data: parsedData,
+              fill: false,
+              backgroundColor: modisData.datasets[0].backgroundColor,
+              borderColor: modisData.datasets[0].borderColor,
+            },
+          ],
+        }
+        setModisData(newModisData);
       }
-      setModisData(newModisData);
+      else{
+        console.log("invalid coordinates selected, do nothing")
+      }
     })
   }
   function fetchChartData(lat, long){
@@ -269,6 +289,9 @@ export function App() {
     return fetch(baseurl).then((response) => response.text())
     .then((textResponse) =>
     parse(textResponse))
+    .catch(function(error){
+      console.log("invalid coords")
+    })
   }
   function parseValuesToInts(data){
     var dataArr = data.split("\n");
@@ -455,7 +478,10 @@ function GraphWindow(){
 const GraphData = () =>(
 
     <Box className={classes.paper}>
+      <Typography variant="h4" align="center"> MODIS NDVI {modisData.coordinates[0] + ', ' + modisData.coordinates[1]} </Typography>
+      <div style={{height:"35vh"}}>
       <Line data={modisData} options={modisDataConfig} />
+      </div>
     </Box>
 
 )
@@ -619,10 +645,18 @@ return (
       <TopBar/>
       <Grid item xs={12}>
         <MapContainer
+          className='mapContainer'
           //loadingControl={true}
+          whenCreated={(map) => {
+              map.on("click", function (e) {
+              const { lat, lng } = e.latlng;
+              getChartData(lng, lat)
+            });
+          }}
           center={center}
           zoom={zoom}
-          style={{ height: graphOn ? "90vh" : "70vh"}}
+          style={{ height: mapHeight,
+          display: "flex"}}
         >
           <MapController />
         </MapContainer>
