@@ -67,7 +67,23 @@ const getLayerRangeByDate = (startDate, endDate, wmsLayers) => {
 }
 
 
-export function App() {
+export function App(props) {
+  // Desired hook
+  function useCompare (val) {
+    const prevVal = usePrevious(val)
+    return prevVal !== val
+  }
+
+  // Helper hook
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }
+
+
   const {setTheme } = useContext(CustomThemeContext)
   const [darkMode, setDarkMode] = useStateWithLabel(true);
   // Initialize Material UI styles
@@ -160,14 +176,16 @@ export function App() {
   const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
   const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
   const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex")
+  const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
 
   // Basemaps
   const basemaps = config.baseLayers
   const [basemapIndex, setBasemapIndex] = useStateWithLabel(2, "basemapIndex")
   const basemapRef = useRef()
-
+  const hasBaseMapChanged = useCompare(basemapIndex);
   // Layers
   const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
+  const hasProductIndexChanged = useCompare(productIndex);
   const productsList = config.productsList;
 
 
@@ -337,55 +355,68 @@ export function App() {
         }
         console.log("Removing layer: ")
         console.log(layer)
-        //map.removeLayer(layer)
+        map.removeLayer(layer)
       })
     }
-
+    //console.log(useCompare(basemapIndex));
     // Hook: basemap change
     useEffect(() => {
-      console.log('basemap change')
-      let oldBasemap = basemapRef.current
-      let newBasemap = basemaps[basemapIndex]
-      let leafletLayer = new L.tileLayer(newBasemap.url, {
-        opacity: 0,
-        attribution: newBasemap.attribution
-      })
-      map.addLayer(leafletLayer)
-      leafletLayer.bringToBack()
-      leafletLayer.setOpacity(1)
-      basemapRef.current = leafletLayer
-
-      return () => {
-        map.removeLayer(basemapRef.current)
+      if(hasBaseMapChanged || isInitialRender){
+        console.log('basemap change hook')
+        if(basemapRef.current!=null){
+        map.removeLayer(basemapRef.current)  
+        }
+        let oldBasemap = basemapRef.current
+        let newBasemap = basemaps[basemapIndex]
+        let leafletLayer = new L.tileLayer(newBasemap.url, {
+          opacity: 0,
+          attribution: newBasemap.attribution
+        })
+        //
+        map.addLayer(leafletLayer)
+        leafletLayer.bringToBack()
+        leafletLayer.setOpacity(1)
+        basemapRef.current = leafletLayer
       }
-    }, [basemapIndex])
+      if(hasBaseMapChanged && !isInitialRender){
+        return () => {
+          //map.removeLayer(basemapRef.current)
+        }
+      }
+    }, [hasBaseMapChanged, basemapIndex])
 
     // Hook: product change
     useEffect(() => {
-      //console.log(newWMS);
-      clearMap()
-    }, [productIndex])
+      if(hasProductIndexChanged || isInitialRender){
+        console.log("Product change hook");
+        //console.log(newWMS);
+        clearMap()
+      }
+    }, [hasProductIndexChanged, productIndex])
 
     // Hook: date range index change
     useEffect(() => {
-      clearMap()
-      const layer = wmsLayers[dateRangeIndex]
-      console.log("new layer: ")
-      console.log(layer)
-      if (!map.hasLayer(layer.leafletLayer)) {
-        console.log("adding layer to the map...")
-        map.addLayer(layer.leafletLayer)
+      if(hasDateRangeIndexChanged || isInitialRender){
+        console.log("date range index hook");
+        clearMap()
+        const layer = wmsLayers[dateRangeIndex]
+        console.log("new layer: ")
+        console.log(layer)
+        if (!map.hasLayer(layer.leafletLayer)) {
+          console.log("adding layer to the map...")
+          map.addLayer(layer.leafletLayer)
+        }
+        layer.leafletLayer.bringToFront()
+        layer.leafletLayer.setOpacity(1)
+        if (animating) {
+          const newIndex = (dateRangeIndex+1) === wmsLayers.length ? 0 : dateRangeIndex+1
+          const timer = setTimeout(() => {
+            setDateRangeIndex(newIndex)
+          }, 10000)
+          return () => { if (timer) clearTimeout(timer) }
+        }
       }
-      layer.leafletLayer.bringToFront()
-      layer.leafletLayer.setOpacity(1)
-      if (animating) {
-        const newIndex = (dateRangeIndex+1) === wmsLayers.length ? 0 : dateRangeIndex+1
-        const timer = setTimeout(() => {
-          setDateRangeIndex(newIndex)
-        }, 10000)
-        return () => { if (timer) clearTimeout(timer) }
-      }
-    }, [dateRangeIndex])
+    }, [hasDateRangeIndexChanged, dateRangeIndex])
 
     // Hook: Animation button clicked - add all layers to the map
     useEffect(() => {
