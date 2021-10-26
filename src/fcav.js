@@ -37,6 +37,9 @@ import {geosearch} from 'esri-leaflet-geocoder'
 import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
 import {Line} from 'react-chartjs-2'
 import { parse } from 'fast-xml-parser';
+import { Chart } from 'chart.js';
+ import annotationPlugin from 'chartjs-plugin-annotation'
+Chart.register(annotationPlugin);
 
 // Map Defaults
 const center = [35, -82]
@@ -147,12 +150,31 @@ export function App(props) {
         fill: false,
         backgroundColor: 'rgb(3, 237, 96)',
         borderColor: 'rgba(3, 237, 96, 0.8)',
+                      xAxisID:'xAxis',
       },
     ],
   }, "MODIS CHART DATA");
 
   const [modisDataConfig, setModisDataConfig] = useStateWithLabel({
     maintainAspectRatio: false,
+    plugins: {
+            annotation: {
+                annotations: [{
+                  drawTime: "afterDatasetsDraw",
+            type: "line",
+            mode: "vertical",
+            scaleID: "xAxis",
+            value: 5,
+            borderWidth: 5,
+            borderColor: "red",
+            label: {
+              content: "TODAY",
+              enabled: true,
+              position: "top"
+            }
+                }]
+            }
+        },
     scales: {
       yAxes: [
         {
@@ -161,7 +183,7 @@ export function App(props) {
             steps: 10,
             stepValue: 5,
             max: 100,
-            fontColor: "white"
+            fontColor: "white",
           },
         },
       ],
@@ -246,6 +268,7 @@ export function App(props) {
     setProductIndex(index);
     let newProduct = getWMSLayersYearRange(startDate, endDate, index);
     setWmsLayers(newProduct);
+    setDateRangeIndex(0);
   }
 
   const onSliderChange = (e, v) => {
@@ -292,6 +315,7 @@ export function App(props) {
               fill: false,
               backgroundColor: modisData.datasets[0].backgroundColor,
               borderColor: modisData.datasets[0].borderColor,
+              xAxisID:'xAxis',
             },
           ],
         }
@@ -364,7 +388,7 @@ export function App(props) {
       if(hasBaseMapChanged || isInitialRender){
         console.log('basemap change hook')
         if(basemapRef.current!=null){
-        map.removeLayer(basemapRef.current)  
+        map.removeLayer(basemapRef.current)
         }
         let oldBasemap = basemapRef.current
         let newBasemap = basemaps[basemapIndex]
@@ -396,7 +420,7 @@ export function App(props) {
 
     // Hook: date range index change
     useEffect(() => {
-      if(hasDateRangeIndexChanged || isInitialRender){
+      if(hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged){
         console.log("date range index hook");
         clearMap()
         const layer = wmsLayers[dateRangeIndex]
@@ -416,7 +440,7 @@ export function App(props) {
           return () => { if (timer) clearTimeout(timer) }
         }
       }
-    }, [hasDateRangeIndexChanged, dateRangeIndex])
+    }, [hasDateRangeIndexChanged, dateRangeIndex, productIndex])
 
     // Hook: Animation button clicked - add all layers to the map
     useEffect(() => {
@@ -511,7 +535,7 @@ const GraphData = () =>(
     <Box className={classes.paper}>
       <Typography variant="h4" align="center"> MODIS NDVI {modisData.coordinates[0] + ', ' + modisData.coordinates[1]} </Typography>
       <div style={{height:"35vh"}}>
-      <Line data={modisData} options={modisDataConfig} />
+      <Line data={modisData} options={modisDataConfig} plugins={[]}/>
       </div>
     </Box>
 
