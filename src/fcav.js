@@ -237,6 +237,7 @@ export function App(props) {
     let newLayerRange = getWMSLayersYearRange(date, endDate, productIndex)
     setWmsLayers(newLayerRange)
     setDateRangeIndex(0)
+    //getChartData(modisData.coordinates[0], modisData.coordinates[1]);
   }
 
   const onEndDateChange = (date) => {
@@ -275,6 +276,42 @@ export function App(props) {
     console.log('slider change')
     console.log('slider value is ' + String(v))
     if (v !== dateRangeIndex) { setDateRangeIndex(v) }
+
+    var newModisConfig = {
+      maintainAspectRatio: false,
+      plugins: {
+              annotation: {
+                  annotations: [{
+                    drawTime: "afterDatasetsDraw",
+              type: "line",
+              mode: "vertical",
+              scaleID: "xAxis",
+              value: v,
+              borderWidth: 5,
+              borderColor: "red",
+              label: {
+                content: "TODAY",
+                enabled: true,
+                position: "top"
+              }
+                  }]
+              }
+          },
+      scales: {
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+              steps: 10,
+              stepValue: 5,
+              max: 100,
+              fontColor: "white",
+            },
+          },
+        ],
+      },
+    }
+    setModisDataConfig(newModisConfig);
   }
 
   const onAnimate = (e, v) => {
@@ -357,10 +394,35 @@ export function App(props) {
       let month = dateSTR.substr(4, 2);
       let day = dateSTR.substr(6, 2);
       //console.log(year + "/" + month + "/" + day);
-      dateSTR = year + "/" + month + "/" + day;
+      dateSTR = month + "/" + day + "/" + year;
       dateArr[i] = dateSTR;
     }
-    return dateArr;
+    //trim array to range
+    let startIndex = 0;
+    let endIndex = 0;
+    let dateObjArr = [dateArr.length];
+    for(let i = 0; i < dateArr.length; i++){
+      let dateSTR = dateArr[i];
+      let month = dateSTR.substr(0,2);
+      let day = dateSTR.substr(3, 2);
+      let year = dateSTR.substr(6, 4);
+      let dateObj = new Date(parseInt(year), parseInt(month)-1, parseInt(day));
+      dateObjArr[i] = dateObj;
+      //console.log(dateObj);
+    }
+    console.log(dateObjArr);
+    for(let i = 0; i < dateObjArr.length; i++){
+      if(startDate > dateObjArr[i]){
+        startIndex = i+1;
+      }
+    }
+    for(let i = dateObjArr.length; i > 0; i--){
+      if(endDate < dateObjArr[i]){
+        endIndex = i-1;
+      }
+    }
+    console.log(startIndex + ', ' + endIndex);
+    return dateArr.slice(startIndex, endIndex);
   }
 
   function MapController () {
