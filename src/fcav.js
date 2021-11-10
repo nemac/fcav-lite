@@ -115,6 +115,8 @@ export function App(props) {
 
   const [animating, setAnimating] = useStateWithLabel(false)
   const [graphOn, setGraphOn] = useStateWithLabel(false, "GraphOn")
+  const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0,0], "currentGraphCoords")
+  const hasGraphCoordsChanged = useCompare(currentGraphCoords);
   const [mapHeight, setMapHeight] = useStateWithLabel("90vh", "mapHeight");
   const [map, setMap] = useStateWithLabel('', "map");
   const handleGraphOpen = () => {
@@ -136,6 +138,7 @@ export function App(props) {
     var lat = map.getCenter().lat;
     var lng = map.getCenter().lng;
     console.log(lat, lng);
+    setCurrentGraphCoords([lat,lng]);
     if(map!=null){
       getChartData(lng,lat);
     }
@@ -150,7 +153,7 @@ export function App(props) {
         fill: false,
         backgroundColor: 'rgb(3, 237, 96)',
         borderColor: 'rgba(3, 237, 96, 0.8)',
-                      xAxisID:'xAxis',
+        xAxisID:'xAxis',
       },
     ],
   }, "MODIS CHART DATA");
@@ -164,9 +167,9 @@ export function App(props) {
             type: "line",
             mode: "vertical",
             scaleID: "xAxis",
-            value: 5,
+            value: 0,
             borderWidth: 5,
-            borderColor: "red",
+            borderColor: "white",
             label: {
               content: "TODAY",
               enabled: true,
@@ -199,6 +202,8 @@ export function App(props) {
   const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
   const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex")
   const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
+  const hasStartDateChanged = useCompare(startDate);
+  const hasEndDateChanged = useCompare(endDate);
 
   // Basemaps
   const basemaps = config.baseLayers
@@ -273,45 +278,9 @@ export function App(props) {
   }
 
   const onSliderChange = (e, v) => {
-    console.log('slider change')
-    console.log('slider value is ' + String(v))
+//    console.log('slider change')
+//    console.log('slider value is ' + String(v))
     if (v !== dateRangeIndex) { setDateRangeIndex(v) }
-
-    var newModisConfig = {
-      maintainAspectRatio: false,
-      plugins: {
-              annotation: {
-                  annotations: [{
-                    drawTime: "afterDatasetsDraw",
-              type: "line",
-              mode: "vertical",
-              scaleID: "xAxis",
-              value: v,
-              borderWidth: 5,
-              borderColor: "red",
-              label: {
-                content: "TODAY",
-                enabled: true,
-                position: "top"
-              }
-                  }]
-              }
-          },
-      scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: true,
-              steps: 10,
-              stepValue: 5,
-              max: 100,
-              fontColor: "white",
-            },
-          },
-        ],
-      },
-    }
-    setModisDataConfig(newModisConfig);
   }
 
   const onAnimate = (e, v) => {
@@ -322,7 +291,7 @@ export function App(props) {
   function getWMSLayersYearRange(startDate, endDate, productIdx){
     let wmsLayers = [];
     let tempDate = getNextFWDate(startDate);
-    console.log("tempdate: " + tempDate);
+//    console.log("tempdate: " + tempDate);
     while(tempDate <= endDate){
       const wmsdate = toWMSDate(tempDate);
       const o = config.wms_template(wmsdate, productIdx)
@@ -342,20 +311,11 @@ export function App(props) {
         console.log(response);
         let parsedData = parseValuesToInts(response.mugl.data.values);
         let xAxis = parseDatesToString(response.mugl.data.values);
-        var newModisData = {
-          labels: xAxis,
-          coordinates: [lat,long],
-          datasets: [
-            {
-              label: response.mugl.verticalaxis.title,
-              data: parsedData,
-              fill: false,
-              backgroundColor: modisData.datasets[0].backgroundColor,
-              borderColor: modisData.datasets[0].borderColor,
-              xAxisID:'xAxis',
-            },
-          ],
-        }
+        let newModisData = Object.assign({}, modisData);
+        newModisData.labels = xAxis;
+        newModisData.coordinates = [lat,long];
+        newModisData.datasets[0].label = response.mugl.verticalaxis.title;
+        newModisData.datasets[0].data = parsedData;
         setModisData(newModisData);
       }
       else{
@@ -418,11 +378,32 @@ export function App(props) {
     }
     for(let i = dateObjArr.length; i > 0; i--){
       if(endDate < dateObjArr[i]){
-        endIndex = i-1;
+        endIndex = i;
       }
     }
     console.log(startIndex + ', ' + endIndex);
     return dateArr.slice(startIndex, endIndex);
+  }
+  function chartLineValue(){
+    let chartDate = modisData.labels[dateRangeIndex];
+    let wmsDate = wmsLayers[dateRangeIndex].date;
+    wmsDate.setDate(wmsDate.getDate() - 1); //account for 1 day offset
+
+    let chartDateSTR = chartDate;
+    let month = chartDateSTR.substr(0,2);
+    let day = chartDateSTR.substr(3, 2);
+    let year = chartDateSTR.substr(6, 4);
+    let chartDateObj = new Date(parseInt(year), parseInt(month)-1, parseInt(day));
+    let dayDifference = Math.floor((wmsDate - chartDateObj) / (1000*60*60*24))
+    console.log("chart date: " + chartDateObj + " wmsDate: " + wmsDate);
+    if(dayDifference!=0){
+      console.log("difference detected: " + dayDifference);
+      let adjustedIndex = dateRangeIndex + 0.5;
+      return adjustedIndex;
+    }
+    else{
+      return dateRangeIndex;
+    }
   }
 
   function MapController () {
@@ -435,8 +416,8 @@ export function App(props) {
       //basemapRef.current.bringToBack()
       map.eachLayer((layer) => {
         if (basemapRef.current === layer) {
-          console.log("Skipping basemap layer...")
-          console.log(basemapRef.current)
+//          console.log("Skipping basemap layer...")
+//          console.log(basemapRef.current)
           return
         }
         console.log("Removing layer: ")
@@ -483,7 +464,7 @@ export function App(props) {
     // Hook: date range index change
     useEffect(() => {
       if(hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged){
-        console.log("date range index hook");
+//        console.log("date range index hook");
         clearMap()
         const layer = wmsLayers[dateRangeIndex]
         console.log("new layer: ")
@@ -501,6 +482,13 @@ export function App(props) {
           }, 10000)
           return () => { if (timer) clearTimeout(timer) }
         }
+        if(graphOn){
+          chartLineValue();
+          let newLineValue = Object.assign({}, modisDataConfig);
+          newLineValue.plugins.annotation.annotations[0].value = dateRangeIndex;
+          newLineValue.plugins.annotation.annotations[0].label.content = modisData.labels[dateRangeIndex];
+          setModisDataConfig(newLineValue);
+        }
       }
     }, [hasDateRangeIndexChanged, dateRangeIndex, productIndex])
 
@@ -514,7 +502,22 @@ export function App(props) {
         }
       })
     }, [animating])
-
+    // hook: has date range changed - update graph data range
+    useEffect(() => {
+      if(hasStartDateChanged || hasEndDateChanged){
+        if(graphOn){
+          getChartData(currentGraphCoords[1], currentGraphCoords[0])
+        }
+      }
+    }, [hasStartDateChanged, hasEndDateChanged, startDate, endDate])
+    //hook: different coordinates selected, update graph data
+    useEffect(() => {
+      if(hasGraphCoordsChanged){
+        if(graphOn){
+          getChartData(currentGraphCoords[1], currentGraphCoords[0])
+        }
+      }
+    }, [hasGraphCoordsChanged, currentGraphCoords])
     if(isInitialRender){ //check if initilization is complete so we don't reinitilize components
     search.addTo(map);
     const legend = L.control({ position: "bottomright"});
@@ -678,7 +681,7 @@ function ThemeSelect () {
     //console.log(newWMS);
     let chosenTheme = themesList[themeIndex]
     chosenTheme = chosenTheme.toLowerCase()
-    console.log("chosen theme: " + chosenTheme)
+//    console.log("chosen theme: " + chosenTheme)
     setTheme(chosenTheme)
     if(chosenTheme === 'dark'){
       setDarkMode(true);
@@ -767,7 +770,8 @@ return (
           whenCreated={(map) => {
               map.on("click", function (e) {
               const { lat, lng } = e.latlng;
-              getChartData(lng, lat)
+              setCurrentGraphCoords([lat,lng]);
+              //getChartData(lng, lat)
             });
           }}
           center={center}
