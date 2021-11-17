@@ -201,6 +201,7 @@ export function App(props) {
   const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
   const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
   const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex")
+  const [currentDate, setCurrentDate] = useStateWithLabel(new Date("2020-01-16"), "currentDate");
   const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
   const hasStartDateChanged = useCompare(startDate);
   const hasEndDateChanged = useCompare(endDate);
@@ -280,7 +281,10 @@ export function App(props) {
   const onSliderChange = (e, v) => {
 //    console.log('slider change')
 //    console.log('slider value is ' + String(v))
-    if (v !== dateRangeIndex) { setDateRangeIndex(v) }
+    if (v !== dateRangeIndex) {
+       setDateRangeIndex(v);
+       setCurrentDate(wmsLayers[v].date);
+     }
   }
 
   const onAnimate = (e, v) => {
@@ -384,7 +388,7 @@ export function App(props) {
     console.log(startIndex + ', ' + endIndex);
     return dateArr.slice(startIndex, endIndex);
   }
-  function chartLineValue(){
+  /*function chartLineValue(){
     let chartDate = modisData.labels[dateRangeIndex];
     let wmsDate = wmsLayers[dateRangeIndex].date;
     wmsDate.setDate(wmsDate.getDate() - 1); //account for 1 day offset
@@ -404,6 +408,46 @@ export function App(props) {
     else{
       return dateRangeIndex;
     }
+  }*/
+  function getChartLineValue(){
+    /*let chartDate = modisData.labels[dateRangeIndex];
+    let wmsDate = wmsLayers[dateRangeIndex].date;
+    wmsDate.setDate(wmsDate.getDate() - 1); //account for 1 day offset
+
+    let chartDateSTR = chartDate;
+    let month = chartDateSTR.substr(0,2);
+    let day = chartDateSTR.substr(3, 2);
+    let year = chartDateSTR.substr(6, 4);
+    let chartDateObj = new Date(parseInt(year), parseInt(month)-1, parseInt(day));
+    console.log(chartDateObj);
+
+    let dateIndex = -1;
+    for(let i = 0; i < wmsLayers.length; i++){
+      let wmsDate = wmsLayers[i].date;
+      wmsDate.setDate(wmsDate.getDate() - 1); //account for 1 day offset
+      if(wmsDate == chartDateObj){
+        dateIndex = i;
+      }
+    }
+    console.log(dateIndex);
+    return dateIndex;*/
+    let chartDate = modisData.labels[dateRangeIndex];
+
+    var wmsLayerStrings = [wmsLayers.length];
+    for(let i = 0; i < wmsLayers.length; i++){
+      let wmsLayer = wmsLayers[i].options.layers;
+
+      let wmsLayerYear = wmsLayer.substr(3, 4);
+      let wmsLayerMonth = wmsLayer.substr(7, 2);
+      let wmsLayerDay = wmsLayer.substr(9, 2);
+
+      let wmsLayerDate = wmsLayerMonth + "/" + wmsLayerDay + "/" + wmsLayerYear;
+      wmsLayerStrings[i] = wmsLayerDate;
+    }
+
+    let dateIndex = -1;
+    dateIndex = modisData.labels.indexOf(wmsLayerStrings[dateRangeIndex]);
+    return dateIndex;
   }
 
   function MapController () {
@@ -483,9 +527,9 @@ export function App(props) {
           return () => { if (timer) clearTimeout(timer) }
         }
         if(graphOn){
-          chartLineValue();
+          //chartLineValue();
           let newLineValue = Object.assign({}, modisDataConfig);
-          newLineValue.plugins.annotation.annotations[0].value = dateRangeIndex;
+          newLineValue.plugins.annotation.annotations[0].value = getChartLineValue();
           newLineValue.plugins.annotation.annotations[0].label.content = modisData.labels[dateRangeIndex];
           setModisDataConfig(newLineValue);
         }
@@ -598,7 +642,7 @@ function GraphWindow(){
 const GraphData = () =>(
 
     <Box className={classes.paper}>
-      <Typography variant="h4" align="center"> MODIS NDVI {modisData.coordinates[0] + ', ' + modisData.coordinates[1]} </Typography>
+      <Typography variant="h4" align="center"> MODIS NDVI {(modisData.coordinates[0]).toFixed(2) + ', ' + (modisData.coordinates[1]).toFixed(2)} </Typography>
       <div style={{height:"35vh"}}>
       <Line data={modisData} options={modisDataConfig} plugins={[]}/>
       </div>
