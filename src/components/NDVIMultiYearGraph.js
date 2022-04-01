@@ -1,0 +1,3 @@
+/* This component will be for the graph that pops up
+when you click on a pixel on the product layer
+*/
