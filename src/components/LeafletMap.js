@@ -1,1 +1,4 @@
-// This component will be for the leaflet map and all of its logic
+/* This component will be for the leaflet map and all of its logic
+We anticipate calling NDVIMultiYearGraph from this component
+MapLegend.js will be in here too
+*/
