@@ -19,10 +19,11 @@ function useStateWithLabel(initialValue, name) {
     return [value, setValue]
 }
 
-const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0,0], "currentGraphCoords");
-const [mapHeight, setMapHeight] = useStateWithLabel("90vh", "mapHeight");
-
 export function LeafletMap() {
+
+    const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0,0], "currentGraphCoords");
+    const [mapHeight, setMapHeight] = useStateWithLabel("90vh", "mapHeight");
+
     return (
         <div>
             <Grid item xs={12}>

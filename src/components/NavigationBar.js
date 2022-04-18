@@ -16,8 +16,8 @@ import { Grid } from "@material-ui/core"
 import { BasemapSelect, ThemeSelect, ProductSelect } from './DropDownSelector'
 import { DateRangePicker } from './Datepicker'
 import { GraphButton } from "./GraphButton";
-import nemacLogoWhite from "./nemac_logo_white.png"
-import nemacLogoBlack from "./nemac_logo_black.png"
+import nemacLogoWhite from "../nemac_logo_white.png"
+import nemacLogoBlack from "../nemac_logo_black.png"
 
 function useStateWithLabel(initialValue, name) {
     const [value, setValue] = useState(initialValue)
@@ -25,9 +25,10 @@ function useStateWithLabel(initialValue, name) {
     return [value, setValue]
 }
 
-const [darkMode, setDarkMode] = useStateWithLabel(true);
-
 export function NavigationBar () {
+
+    const [darkMode, setDarkMode] = useStateWithLabel(true);
+
   return (
     //<ThemeProvider theme={fcavtheme}>
     <Grid item xs={12}>
