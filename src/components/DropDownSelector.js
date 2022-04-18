@@ -51,13 +51,13 @@ export function BasemapSelect () {
     const [basemapIndex, setBasemapIndex] = useStateWithLabel(2, "basemapIndex");
     const productsList = config.productsList;
 
-    // Layers
-    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
-    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
-
     // Date State
     const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
     const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
+
+    // Layers
+    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
+    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
 
     // State change and event handlers
 
@@ -116,13 +116,13 @@ export function ThemeSelect () {
     const [basemapIndex, setBasemapIndex] = useStateWithLabel(2, "basemapIndex");
     const productsList = config.productsList;
 
-    // Layers
-    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
-    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
-
     // Date State
     const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
     const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
+
+    // Layers
+    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
+    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
 
     // State change and event handlers
 
@@ -195,13 +195,13 @@ export function ProductSelect () {
     const [basemapIndex, setBasemapIndex] = useStateWithLabel(2, "basemapIndex");
     const productsList = config.productsList;
 
-    // Layers
-    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
-    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
-
     // Date State
     const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
     const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
+
+    // Layers
+    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
+    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
 
     // State change and event handlers
 

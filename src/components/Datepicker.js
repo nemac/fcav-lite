@@ -62,6 +62,22 @@ export function DateRangePicker () {
     const hasStartDateChanged = useCompare(startDate);
     const hasEndDateChanged = useCompare(endDate);
 
+    const getWMSLayersYearRange = (startDate, endDate, productIdx) => {
+        let wmsLayers = [];
+        let tempDate = getNextFWDate(startDate);
+//    console.log("tempdate: " + tempDate);
+        while(tempDate <= endDate){
+            const wmsdate = toWMSDate(tempDate);
+            const o = config.wms_template(wmsdate, productIdx)
+            o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
+            o.date = tempDate
+            wmsLayers.push(o);
+            tempDate.setDate(tempDate.getDate() + 1);
+            tempDate = getNextFWDate(tempDate);
+        }
+        return wmsLayers;
+    }
+
     // Basemap
     const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
 
@@ -86,22 +102,6 @@ export function DateRangePicker () {
         setWmsLayers(newLayerRange)
         setDateRangeIndex(0)
         //getChartData(modisData.coordinates[0], modisData.coordinates[1]);
-    }
-
-    const getWMSLayersYearRange = (startDate, endDate, productIdx) => {
-        let wmsLayers = [];
-        let tempDate = getNextFWDate(startDate);
-//    console.log("tempdate: " + tempDate);
-        while(tempDate <= endDate){
-            const wmsdate = toWMSDate(tempDate);
-            const o = config.wms_template(wmsdate, productIdx)
-            o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
-            o.date = tempDate
-            wmsLayers.push(o);
-            tempDate.setDate(tempDate.getDate() + 1);
-            tempDate = getNextFWDate(tempDate);
-        }
-        return wmsLayers;
     }
 
     const onSliderChange = (e, v) => {
