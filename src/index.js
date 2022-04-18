@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "leaflet/dist/leaflet.css";
-import {App} from "./fcav";
+import App from "App";
 //import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CustomThemeProvider from './CustomThemeProvider'
 

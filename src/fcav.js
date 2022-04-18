@@ -40,7 +40,7 @@ import { parse } from 'fast-xml-parser';
 import { Chart } from 'chart.js';
  import annotationPlugin from 'chartjs-plugin-annotation'
 Chart.register(annotationPlugin);
-import { TopBar } from './components/NavigationBar'
+import { NavigationBar } from './components/NavigationBar'
 
 // Map Defaults
 const center = [35, -82]
@@ -266,6 +266,7 @@ export function App(props) {
     let index = event.target.value
     setBasemapIndex(index)
   }
+
   const onThemeChange = (event) => {
     let index = event.target.value
     setThemeIndex(index)
@@ -451,7 +452,7 @@ export function App(props) {
     return dateIndex;
   }
 
-  function MapController () {
+  export function MapController () {
     const search = geosearch()
     const map = useMap()
     setMap(map);
@@ -700,7 +701,7 @@ function DateRangePicker () {
 return (
   <div>
     <Grid container>
-      <TopBar/>
+      <NavigationBar/>
       <Grid item xs={12}>
         <MapContainer
           className='mapContainer'

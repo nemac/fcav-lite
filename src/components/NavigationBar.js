@@ -8,15 +8,26 @@ End Date - Datepicker.js
 Product - DropdownSelector.js
 Theme - DropdownSelector.js
 */
-import React from 'react';
+import React, {useDebugValue, useState} from 'react';
 import ReactDOM from 'react-dom';
 import AppBar from "@material-ui/core/AppBar"
 import Toolbar from "@material-ui/core/Toolbar"
 import { Grid } from "@material-ui/core"
 import { BasemapSelect, ThemeSelect, ProductSelect } from './DropDownSelector'
 import { DateRangePicker } from './Datepicker'
+import { GraphButton } from "./GraphButton";
+import nemacLogoWhite from "./nemac_logo_white.png"
+import nemacLogoBlack from "./nemac_logo_black.png"
 
-function TopBar () {
+function useStateWithLabel(initialValue, name) {
+    const [value, setValue] = useState(initialValue)
+    useDebugValue(`${name}: ${value}`)
+    return [value, setValue]
+}
+
+const [darkMode, setDarkMode] = useStateWithLabel(true);
+
+export function NavigationBar () {
   return (
     //<ThemeProvider theme={fcavtheme}>
     <Grid item xs={12}>
@@ -31,7 +42,7 @@ function TopBar () {
           <DateRangePicker/>
           <ProductSelect/>
           <ThemeSelect/>
-          <GraphBtn/>
+          <GraphButton/>
         </Toolbar>
       </AppBar>
     </Grid>
