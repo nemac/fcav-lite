@@ -30,21 +30,6 @@ function usePrevious(value) {
     return ref.current;
 }
 
-// Date State
-const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
-const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
-const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex")
-const [currentDate, setCurrentDate] = useStateWithLabel(new Date("2020-01-16"), "currentDate");
-const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
-const hasStartDateChanged = useCompare(startDate);
-const hasEndDateChanged = useCompare(endDate);
-
-// Basemap
-const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
-
-// Layers
-const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
-
 // Initialize Material UI styles
 const useStyles = makeStyles({
     root: {
@@ -65,67 +50,84 @@ const useStyles = makeStyles({
         padding: 4,
     },
 })
-const classes = useStyles();
-
-// State change and event handlers
-
-const onStartDateChange = (date) => {
-    let day = date.getDate().toString()
-    if(day.length < 2){
-        day = "0" + day
-    }
-    let month = (date.getMonth()+1).toString()
-    if(month.length < 2) {
-        month = "0" + month
-    }
-    setStartDate(date)
-    let newLayerRange = getWMSLayersYearRange(date, endDate, productIndex)
-    setWmsLayers(newLayerRange)
-    setDateRangeIndex(0)
-    //getChartData(modisData.coordinates[0], modisData.coordinates[1]);
-}
-
-function getWMSLayersYearRange(startDate, endDate, productIdx){
-    let wmsLayers = [];
-    let tempDate = getNextFWDate(startDate);
-//    console.log("tempdate: " + tempDate);
-    while(tempDate <= endDate){
-        const wmsdate = toWMSDate(tempDate);
-        const o = config.wms_template(wmsdate, productIdx)
-        o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
-        o.date = tempDate
-        wmsLayers.push(o);
-        tempDate.setDate(tempDate.getDate() + 1);
-        tempDate = getNextFWDate(tempDate);
-    }
-    return wmsLayers;
-}
-
-const onSliderChange = (e, v) => {
-//    console.log('slider change')
-//    console.log('slider value is ' + String(v))
-    if (v !== dateRangeIndex) {
-        setDateRangeIndex(v);
-        setCurrentDate(wmsLayers[v].date);
-    }
-}
-
-const onEndDateChange = (date) => {
-    let day = date.getDate().toString()
-    if (day.length < 2) {
-        day = "0" + day
-    }
-    let month = (date.getMonth()+1).toString()
-    if (month.length < 2) {
-        month = "0" + month
-    }
-    setEndDate(date) //set end date state
-    let newLayerRange = getWMSLayersYearRange(startDate, date, productIndex)
-    setWmsLayers(newLayerRange);
-    setDateRangeIndex(0)
-}
 
 export function DateRangePicker () {
+
+    // Date State
+    const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
+    const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
+    const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex")
+    const [currentDate, setCurrentDate] = useStateWithLabel(new Date("2020-01-16"), "currentDate");
+    const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
+    const hasStartDateChanged = useCompare(startDate);
+    const hasEndDateChanged = useCompare(endDate);
+
+    // Basemap
+    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
+
+    // Layers
+    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
+
+    const classes = useStyles();
+
+    // State change and event handlers
+
+    const onStartDateChange = (date) => {
+        let day = date.getDate().toString()
+        if(day.length < 2){
+            day = "0" + day
+        }
+        let month = (date.getMonth()+1).toString()
+        if(month.length < 2) {
+            month = "0" + month
+        }
+        setStartDate(date)
+        let newLayerRange = getWMSLayersYearRange(date, endDate, productIndex)
+        setWmsLayers(newLayerRange)
+        setDateRangeIndex(0)
+        //getChartData(modisData.coordinates[0], modisData.coordinates[1]);
+    }
+
+    const getWMSLayersYearRange = (startDate, endDate, productIdx) => {
+        let wmsLayers = [];
+        let tempDate = getNextFWDate(startDate);
+//    console.log("tempdate: " + tempDate);
+        while(tempDate <= endDate){
+            const wmsdate = toWMSDate(tempDate);
+            const o = config.wms_template(wmsdate, productIdx)
+            o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
+            o.date = tempDate
+            wmsLayers.push(o);
+            tempDate.setDate(tempDate.getDate() + 1);
+            tempDate = getNextFWDate(tempDate);
+        }
+        return wmsLayers;
+    }
+
+    const onSliderChange = (e, v) => {
+//    console.log('slider change')
+//    console.log('slider value is ' + String(v))
+        if (v !== dateRangeIndex) {
+            setDateRangeIndex(v);
+            setCurrentDate(wmsLayers[v].date);
+        }
+    }
+
+    const onEndDateChange = (date) => {
+        let day = date.getDate().toString()
+        if (day.length < 2) {
+            day = "0" + day
+        }
+        let month = (date.getMonth()+1).toString()
+        if (month.length < 2) {
+            month = "0" + month
+        }
+        setEndDate(date) //set end date state
+        let newLayerRange = getWMSLayersYearRange(startDate, date, productIndex)
+        setWmsLayers(newLayerRange);
+        setDateRangeIndex(0)
+    }
+
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <KeyboardDatePicker style={{marginRight: 16 }}
