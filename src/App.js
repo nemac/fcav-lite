@@ -12,7 +12,8 @@ export default function App() {
 
   return (
       <div>
-        <NavigationBar/>
+          <NavigationBar/>
+          <LeafletMap/>
       </div>
   );
 }
