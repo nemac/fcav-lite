@@ -8,85 +8,16 @@ import {getNextFWDate, toWMSDate} from "../datemanagement";
 import config from "../config";
 import L from "leaflet";
 import {makeStyles} from "@material-ui/core/styles";
+import { useStateWithLabel, useCompare, getWMSLayersYearRange } from "../utils";
 
-function useStateWithLabel(initialValue, name) {
-    const [value, setValue] = useState(initialValue)
-    useDebugValue(`${name}: ${value}`)
-    return [value, setValue]
-}
-
-// Desired hook
-function useCompare (val) {
-    const prevVal = usePrevious(val)
-    return prevVal !== val
-}
-
-// Helper hook
-function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-        ref.current = value;
-    });
-    return ref.current;
-}
-
-// Initialize Material UI styles
-const useStyles = makeStyles({
-    root: {
-        width: 300,
-    },
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    paper: {
-        position: 'absolute',
-        color: "white",
-        width: '100%',
-        height: '45vh',
-        background: 'rgb(26, 35, 39)',
-        boxShadow: 24,
-        padding: 4,
-    },
-})
-
-export function DateRangePicker () {
+export function DateRangePicker ({ classes, startDate, setStartDate, endDate, setEndDate, dateRangeIndex,
+                                     setDateRangeIndex, productIndex, wmsLayers, setWmsLayers }) {
 
     // Date State
-    const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate")
-    const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate")
-    const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex")
     const [currentDate, setCurrentDate] = useStateWithLabel(new Date("2020-01-16"), "currentDate");
     const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
     const hasStartDateChanged = useCompare(startDate);
     const hasEndDateChanged = useCompare(endDate);
-
-    const getWMSLayersYearRange = (startDate, endDate, productIdx) => {
-        let wmsLayers = [];
-        let tempDate = getNextFWDate(startDate);
-//    console.log("tempdate: " + tempDate);
-        while(tempDate <= endDate){
-            const wmsdate = toWMSDate(tempDate);
-            const o = config.wms_template(wmsdate, productIdx)
-            o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
-            o.date = tempDate
-            wmsLayers.push(o);
-            tempDate.setDate(tempDate.getDate() + 1);
-            tempDate = getNextFWDate(tempDate);
-        }
-        return wmsLayers;
-    }
-
-    // Basemap
-    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex")
-
-    // Layers
-    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers")
-
-    const classes = useStyles();
-
-    // State change and event handlers
 
     const onStartDateChange = (date) => {
         let day = date.getDate().toString()

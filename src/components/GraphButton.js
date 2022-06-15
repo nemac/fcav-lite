@@ -4,40 +4,7 @@ import AssessmentIcon from "@material-ui/icons/Assessment";
 import React, {useDebugValue, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 
-function useStateWithLabel(initialValue, name) {
-    const [value, setValue] = useState(initialValue)
-    useDebugValue(`${name}: ${value}`)
-    return [value, setValue]
-}
-
-// Initialize Material UI styles
-const useStyles = makeStyles({
-    root: {
-        width: 300,
-    },
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    paper: {
-        position: 'absolute',
-        color: "white",
-        width: '100%',
-        height: '45vh',
-        background: 'rgb(26, 35, 39)',
-        boxShadow: 24,
-        padding: 4,
-    },
-});
-
-export function GraphButton(props){
-
-    const [graphOn, setGraphOn] = useStateWithLabel(false, "GraphOn");
-
-    const [map, setMap] = useStateWithLabel('', "map");
-
-    const classes = useStyles();
+export function GraphButton({ classes, graphOn, setGraphOn, map }) {
 
     const handleGraphOpen = () => {
         //setModisData(getChartData(-78.65678578328217,35.45115625827913));

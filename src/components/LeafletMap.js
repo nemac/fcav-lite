@@ -15,132 +15,37 @@ import forwarn2Legend from "../forwarn2-legend.png";
 import config from "../config";
 import {getNextFWDate, toWMSDate} from "../datemanagement";
 import {parse} from "fast-xml-parser";
+import { useStateWithLabel, useCompare } from "../utils";
 
 // Map Defaults
 const center = [35, -82]
 const zoom = 13
 
-function useStateWithLabel(initialValue, name) {
-    const [value, setValue] = useState(initialValue)
-    useDebugValue(`${name}: ${value}`)
-    return [value, setValue]
-}
 
-// Helper hook
-function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-        ref.current = value;
-    });
-    return ref.current;
-}
-
-// Desired hook
-function useCompare (val) {
-    const prevVal = usePrevious(val)
-    return prevVal !== val
-}
-
-function getWMSLayersYearRange(startDate, endDate, productIdx){
-    let wmsLayers = [];
-    let tempDate = getNextFWDate(startDate);
-//    console.log("tempdate: " + tempDate);
-    while(tempDate <= endDate){
-        const wmsdate = toWMSDate(tempDate);
-        const o = config.wms_template(wmsdate, productIdx)
-        o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options)
-        o.date = tempDate
-        wmsLayers.push(o);
-        tempDate.setDate(tempDate.getDate() + 1);
-        tempDate = getNextFWDate(tempDate);
-    }
-    return wmsLayers;
-}
-
-function MapController () {
+function MapController ({ graphOn, currentGraphCoords, setMap, modisData, setModisData, modisDataConfig,
+                            setModisDataConfig, startDate, endDate, dateRangeIndex, setDateRangeIndex, basemaps,
+                            basemapIndex, productIndex, wmsLayers }) {
     const search = geosearch()
 
-    const map = useMap(); // TODO: This and other variables probably need to be shared across components for the app to
-    // TODO: work properly. I.E. There is a higher level state state variable and setter const [map, setMap]
-    // TODO: = useState(...); in the App component in fcav.js
+    const map = useMap();
+    setMap(map);
 
     const basemapRef = useRef();
 
-    const basemaps = config.baseLayers;
-    const [basemapIndex, setBasemapIndex] = useStateWithLabel(2, "basemapIndex");
     const hasBaseMapChanged = useCompare(basemapIndex);
 
     const [isInitialRender, setIsInitialRender] = useStateWithLabel(true, "initialrender");
 
-    const [productIndex, setProductIndex] = useStateWithLabel(0, "productIndex");
     const hasProductIndexChanged = useCompare(productIndex);
 
     // Date State
-    const [startDate, setStartDate] = useStateWithLabel(new Date("2020-01-16"), "startDate");
-    const [endDate, setEndDate] = useStateWithLabel(new Date("2021-02-17"), "endDate");
-    const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, "dateRangeIndex");
-    const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
     const hasStartDateChanged = useCompare(startDate);
     const hasEndDateChanged = useCompare(endDate);
-
-    const [wmsLayers, setWmsLayers] = useStateWithLabel(getWMSLayersYearRange(startDate, endDate, productIndex), "fullWMSLayers");
+    const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
 
     const [animating, setAnimating] = useStateWithLabel(false);
 
-    const [graphOn, setGraphOn] = useStateWithLabel(false, "GraphOn");
-
-    const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0,0], "currentGraphCoords");
     const hasGraphCoordsChanged = useCompare(currentGraphCoords);
-
-    const [modisData, setModisData] = useStateWithLabel({
-        labels: ['1', '2', '3', '4', '5', '6'],
-        coordinates: [0,0],
-        datasets: [
-            {
-                label: '# of Votes',
-                data: [],
-                fill: false,
-                backgroundColor: 'rgb(3, 237, 96)',
-                borderColor: 'rgba(3, 237, 96, 0.8)',
-                xAxisID:'xAxis',
-            },
-        ],
-    }, "MODIS CHART DATA");
-
-    const [modisDataConfig, setModisDataConfig] = useStateWithLabel({
-        maintainAspectRatio: false,
-        plugins: {
-            annotation: {
-                annotations: [{
-                    drawTime: "afterDatasetsDraw",
-                    type: "line",
-                    mode: "vertical",
-                    scaleID: "xAxis",
-                    value: 0,
-                    borderWidth: 5,
-                    borderColor: "white",
-                    label: {
-                        content: "TODAY",
-                        enabled: true,
-                        position: "top"
-                    }
-                }]
-            }
-        },
-        scales: {
-            yAxes: [
-                {
-                    ticks: {
-                        beginAtZero: true,
-                        steps: 10,
-                        stepValue: 5,
-                        max: 100,
-                        fontColor: "white",
-                    },
-                },
-            ],
-        },
-    }, "MODIS CHART CONFIG");
 
     const fetchChartData = (lat, long) => {
         const baseurl = 'https://fcav-ndvi-dev.nemac.org/tsmugl_product.cgi?args=CONUS_NDVI,' + lat + ',' + long;
@@ -404,10 +309,61 @@ function MapController () {
 
 }
 
-export function LeafletMap() {
+export function LeafletMap({ classes, graphOn, setMap, startDate, endDate, dateRangeIndex, setDateRangeIndex,
+                               basemaps, basemapIndex, productIndex, wmsLayers }) {
 
     const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0,0], "currentGraphCoords");
     const [mapHeight, setMapHeight] = useStateWithLabel("90vh", "mapHeight");
+
+    const [modisData, setModisData] = useStateWithLabel({
+        labels: ['1', '2', '3', '4', '5', '6'],
+        coordinates: [0,0],
+        datasets: [
+            {
+                label: 'NDVI',
+                data: [],
+                fill: false,
+                backgroundColor: 'rgb(3, 237, 96)',
+                borderColor: 'rgba(3, 237, 96, 0.8)',
+                xAxisID:'xAxis',
+            },
+        ],
+    }, "MODIS CHART DATA");
+
+    const [modisDataConfig, setModisDataConfig] = useStateWithLabel({
+        maintainAspectRatio: false,
+        plugins: {
+            annotation: {
+                annotations: [{
+                    drawTime: "afterDatasetsDraw",
+                    type: "line",
+                    mode: "vertical",
+                    scaleID: "xAxis",
+                    value: 0,
+                    borderWidth: 5,
+                    borderColor: "white",
+                    label: {
+                        content: "TODAY",
+                        enabled: true,
+                        position: "top"
+                    }
+                }]
+            }
+        },
+        scales: {
+            yAxes: [
+                {
+                    ticks: {
+                        beginAtZero: true,
+                        steps: 10,
+                        stepValue: 5,
+                        max: 100,
+                        fontColor: "white",
+                    },
+                },
+            ],
+        },
+    }, "MODIS CHART CONFIG");
 
     return (
         <div>
@@ -427,10 +383,16 @@ export function LeafletMap() {
                     style={{ height: mapHeight,
                         display: "flex"}}
                 >
-                    <MapController />
+                    <MapController graphOn={graphOn} currentGraphCoords={currentGraphCoords} setMap={setMap}
+                                   modisData={modisData} setModisData={setModisData} modisDataConfig={modisDataConfig}
+                                   setModisDataConfig={setModisDataConfig} startDate={startDate} endDate={endDate}
+                                   dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex}
+                                   basemaps={basemaps} basemapIndex={basemapIndex} productIndex={productIndex}
+                                   wmsLayers={wmsLayers} />
                 </MapContainer>
             </Grid>
-            <NDVIMultiYearGraph/>
+            <NDVIMultiYearGraph classes={classes} graphOn={graphOn} modisData={modisData}
+                                modisDataConfig={modisDataConfig} />
         </div>
     );
 }

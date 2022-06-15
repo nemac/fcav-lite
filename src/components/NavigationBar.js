@@ -18,14 +18,12 @@ import { DateRangePicker } from './Datepicker'
 import { GraphButton } from "./GraphButton";
 import nemacLogoWhite from "../nemac_logo_white.png"
 import nemacLogoBlack from "../nemac_logo_black.png"
+import {makeStyles} from "@material-ui/core/styles";
+import { useStateWithLabel } from "../utils";
 
-function useStateWithLabel(initialValue, name) {
-    const [value, setValue] = useState(initialValue)
-    useDebugValue(`${name}: ${value}`)
-    return [value, setValue]
-}
-
-export function NavigationBar () {
+export function NavigationBar ({ classes, graphOn, setGraphOn, map, startDate, setStartDate, endDate, setEndDate,
+                                   dateRangeIndex, setDateRangeIndex, basemaps, basemapIndex, setBasemapIndex,
+                                   productIndex, setProductIndex, wmsLayers, setWmsLayers }) {
 
     const [darkMode, setDarkMode] = useStateWithLabel(true);
 
@@ -39,11 +37,15 @@ export function NavigationBar () {
       >
         <Toolbar>
           <img src={ darkMode ? nemacLogoWhite : nemacLogoBlack} width="150" alt="your mom"></img>
-          <BasemapSelect/>
-          <DateRangePicker/>
-          <ProductSelect/>
-          <ThemeSelect/>
-          <GraphButton/>
+          <BasemapSelect basemaps={basemaps} basemapIndex={basemapIndex} setBasemapIndex={setBasemapIndex} />
+          <DateRangePicker classes={classes} startDate={startDate} setStartDate={setStartDate} endDate={endDate}
+                           setEndDate={setEndDate} dateRangeIndex={dateRangeIndex}
+                           setDateRangeIndex={setDateRangeIndex} productIndex={productIndex} wmsLayers={wmsLayers}
+                           setWmsLayers={setWmsLayers} />
+          <ProductSelect startDate={startDate} endDate={endDate} setDateRangeIndex={setDateRangeIndex}
+                         productIndex={productIndex} setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} />
+          <ThemeSelect setDarkMode={setDarkMode} />
+          <GraphButton classes={classes} graphOn={graphOn} setGraphOn={setGraphOn} map={map} />
         </Toolbar>
       </AppBar>
     </Grid>
