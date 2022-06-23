@@ -4,17 +4,18 @@ MapLegend.js will be in here too
 */
 
 import React, {useDebugValue, useEffect, useRef, useState} from 'react';
-import { NDVIMultiYearGraph } from "./NDVIMultiYearGraph";
 import {Grid} from "@material-ui/core";
 import {MapContainer, useMap} from "react-leaflet";
 import 'leaflet-loading';
 import 'leaflet-loading/src/Control.Loading.css';
 import {geosearch} from "esri-leaflet-geocoder";
 import L from "leaflet";
+import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
 import forwarn2Legend from "../forwarn2-legend.png";
 import config from "../config";
 import {getNextFWDate, toWMSDate} from "../datemanagement";
 import {parse} from "fast-xml-parser";
+import { NDVIMultiYearGraph } from "./NDVIMultiYearGraph";
 import { useStateWithLabel, useCompare } from "../utils";
 
 // Map Defaults
@@ -309,7 +310,25 @@ function MapController ({ graphOn, currentGraphCoords, setMap, modisData, setMod
 
 }
 
-export function LeafletMap({ classes, graphOn, setMap, startDate, endDate, dateRangeIndex, setDateRangeIndex,
+MapController.propTypes = {
+    graphOn: propTypes.bool.isRequired,
+    currentGraphCoords: propTypes.array.isRequired,
+    setMap: propTypes.function.isRequired,
+    modisData: propTypes.object.isRequired,
+    setModisData: propTypes.function.isRequired,
+    modisDataConfig: propTypes.object.isRequired,
+    setModisDataConfig: propTypes.function.isRequired,
+    startDate: propTypes.instanceOf(Date).isRequired,
+    endDate: propTypes.instanceOf(Date).isRequired,
+    dateRangeIndex: propTypes.number.isRequired,
+    setDateRangeIndex: propTypes.function.isRequired,
+    basemaps: propTypes.array.isRequired,
+    basemapIndex: propTypes.number.isRequired,
+    productIndex: propTypes.number.isRequired,
+    wmsLayers: propTypes.array.isRequired  
+};
+
+export function LeafletMap({ graphOn, setMap, startDate, endDate, dateRangeIndex, setDateRangeIndex,
                                basemaps, basemapIndex, productIndex, wmsLayers }) {
 
     const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0,0], "currentGraphCoords");
@@ -391,8 +410,21 @@ export function LeafletMap({ classes, graphOn, setMap, startDate, endDate, dateR
                                    wmsLayers={wmsLayers} />
                 </MapContainer>
             </Grid>
-            <NDVIMultiYearGraph classes={classes} graphOn={graphOn} modisData={modisData}
+            <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}
                                 modisDataConfig={modisDataConfig} />
         </div>
     );
 }
+
+LeafletMap.propTypes = {
+    graphOn: propTypes.bool.isRequired,
+    setMap: propTypes.function.isRequired,
+    startDate: propTypes.instanceOf(Date).isRequired,
+    endDate: propTypes.instanceOf(Date).isRequired,
+    dateRangeIndex: propTypes.number.isRequired,
+    setDateRangeIndex: propTypes.function.isRequired,
+    basemaps: propTypes.array.isRequired,
+    basemapIndex: propTypes.number.isRequired,
+    productIndex: propTypes.number.isRequired,
+    wmsLayers: propTypes.array.isRequired  
+};

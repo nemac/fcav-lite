@@ -9,6 +9,7 @@ import FormControl from '@material-ui/core/FormControl'
 import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
+import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
 import config from "../config";
 import {CustomThemeContext} from "../CustomThemeProvider";
 import {getNextFWDate, toWMSDate} from "../datemanagement";
@@ -43,6 +44,12 @@ export function BasemapSelect ({ basemaps, basemapIndex, setBasemapIndex }) {
     </FormControl>
   )
 }
+
+BasemapSelect.propTypes = {
+  basemaps: propTypes.array.isRequired,
+  basemapIndex: propTypes.number.isRequired,
+  setBasemapIndex: propTypes.function.isRequired
+};
 
 export function ThemeSelect ({ setDarkMode }) {
 
@@ -94,6 +101,10 @@ export function ThemeSelect ({ setDarkMode }) {
   )
 }
 
+ThemeSelect.propTypes = {
+  setDarkMode: propTypes.function.isRequired
+};
+
 export function ProductSelect ({ startDate, endDate, setDateRangeIndex, productIndex, setProductIndex, setWmsLayers }) {
 
     const productsList = config.productsList;
@@ -127,3 +138,12 @@ export function ProductSelect ({ startDate, endDate, setDateRangeIndex, productI
     </FormControl>
   )
 }
+
+ProductSelect.propTypes = {
+  startDate: propTypes.instanceOf(Date).isRequired,
+  endDate: propTypes.instanceOf(Date).isRequired,
+  setDateRangeIndex: propTypes.function.isRequired,
+  productIndex: propTypes.number.isRequired,
+  setProductIndex: propTypes.function.isRequired,
+  setWmsLayers: propTypes.function.isRequired
+};

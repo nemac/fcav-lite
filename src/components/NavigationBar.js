@@ -10,9 +10,11 @@ Theme - DropdownSelector.js
 */
 import React, {useDebugValue, useState} from 'react';
 import ReactDOM from 'react-dom';
+import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
 import AppBar from "@material-ui/core/AppBar"
 import Toolbar from "@material-ui/core/Toolbar"
 import { Grid } from "@material-ui/core"
+import L from 'leaflet';
 import { BasemapSelect, ThemeSelect, ProductSelect } from './DropDownSelector'
 import { DateRangePicker } from './Datepicker'
 import { GraphButton } from "./GraphButton";
@@ -21,7 +23,7 @@ import nemacLogoBlack from "../nemac_logo_black.png"
 import {makeStyles} from "@material-ui/core/styles";
 import { useStateWithLabel } from "../utils";
 
-export function NavigationBar ({ classes, graphOn, setGraphOn, map, startDate, setStartDate, endDate, setEndDate,
+export function NavigationBar ({ graphOn, setGraphOn, map, startDate, setStartDate, endDate, setEndDate,
                                    dateRangeIndex, setDateRangeIndex, basemaps, basemapIndex, setBasemapIndex,
                                    productIndex, setProductIndex, wmsLayers, setWmsLayers }) {
 
@@ -38,17 +40,36 @@ export function NavigationBar ({ classes, graphOn, setGraphOn, map, startDate, s
         <Toolbar>
           <img src={ darkMode ? nemacLogoWhite : nemacLogoBlack} width="150" alt="your mom"></img>
           <BasemapSelect basemaps={basemaps} basemapIndex={basemapIndex} setBasemapIndex={setBasemapIndex} />
-          <DateRangePicker classes={classes} startDate={startDate} setStartDate={setStartDate} endDate={endDate}
+          <DateRangePicker startDate={startDate} setStartDate={setStartDate} endDate={endDate}
                            setEndDate={setEndDate} dateRangeIndex={dateRangeIndex}
                            setDateRangeIndex={setDateRangeIndex} productIndex={productIndex} wmsLayers={wmsLayers}
                            setWmsLayers={setWmsLayers} />
           <ProductSelect startDate={startDate} endDate={endDate} setDateRangeIndex={setDateRangeIndex}
                          productIndex={productIndex} setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} />
           <ThemeSelect setDarkMode={setDarkMode} />
-          <GraphButton classes={classes} graphOn={graphOn} setGraphOn={setGraphOn} map={map} />
+          <GraphButton graphOn={graphOn} setGraphOn={setGraphOn} map={map} />
         </Toolbar>
       </AppBar>
     </Grid>
     //</ThemeProvider>
   )
 }
+
+NavigationBar.propTypes = {
+  graphOn: propTypes.bool.isRequired,
+  setGraphOn: propTypes.function.isRequired,
+  map: propTypes.instanceOf(L.Map).isRequired,
+  startDate: propTypes.instanceOf(Date).isRequired,
+  setStartDate: propTypes.function.isRequired,
+  endDate: propTypes.instanceOf(Date).isRequired,
+  setEndDate: propTypes.function.isRequired,
+  dateRangeIndex: propTypes.number.isRequired,
+  setDateRangeIndex: propTypes.function.isRequired,
+  basemaps: propTypes.array.isRequired,
+  basemapIndex: propTypes.number.isRequired,
+  setBasemapIndex: propTypes.function.isRequired,
+  productIndex: propTypes.number.isRequired,
+  setProductIndex: propTypes.function.isRequired,
+  wmsLayers: propTypes.array.isRequired,
+  setWmsLayers: propTypes.function.isRequired
+};
