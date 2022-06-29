@@ -2,19 +2,19 @@
 when you click on a pixel on the product layer
 */
 
-import {Grid} from "@material-ui/core";
-import React, {useDebugValue, useState} from "react";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import {Line} from "react-chartjs-2";
-import {makeStyles} from "@material-ui/core/styles";
+import { Grid } from '@material-ui/core';
+import React, { useDebugValue, useState } from 'react';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
+import { Line } from 'react-chartjs-2';
+import { makeStyles } from '@material-ui/core/styles';
 import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
 
-export function NDVIMultiYearGraph({ graphOn, modisData, modisDataConfig }) {
+export const NDVIMultiYearGraph = ({ graphOn, modisData, modisDataConfig }) => {
   const useStyles = makeStyles({
     paper: {
       position: 'absolute',
-      color: "white",
+      color: 'white',
       width: '100%',
       height: '45vh',
       background: 'rgb(26, 35, 39)',
@@ -25,12 +25,12 @@ export function NDVIMultiYearGraph({ graphOn, modisData, modisDataConfig }) {
 
   const classes = useStyles();
 
-  const GraphData = () =>(
+  const GraphData = () => (
 
         <Box className={classes.paper}>
-            <Typography variant="h4" align="center"> MODIS NDVI {(modisData.coordinates[0]).toFixed(2) + ', '
-            + (modisData.coordinates[1]).toFixed(2)} </Typography>
-            <div style={{height:"35vh"}}>
+            <Typography variant="h4" align="center"> MODIS NDVI {`${(modisData.coordinates[0]).toFixed(2)}, ${
+              (modisData.coordinates[1]).toFixed(2)}`} </Typography>
+            <div style={{ height: '35vh' }}>
                 <Line data={modisData} options={modisDataConfig} plugins={[]}/>
             </div>
         </Box>
@@ -54,7 +54,7 @@ export function NDVIMultiYearGraph({ graphOn, modisData, modisDataConfig }) {
             { graphOn ? <GraphData /> : null }
         </Grid>
   );
-}
+};
 
 NDVIMultiYearGraph.propTypes = {
   graphOn: propTypes.bool.isRequired,

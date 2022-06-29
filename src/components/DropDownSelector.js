@@ -3,28 +3,29 @@ Basemap dropdown
 Product dropdown
 Theme dropdown
 */
-import React, {useContext, useDebugValue, useEffect, useState} from 'react';
+import React, {
+  useContext, useDebugValue, useEffect, useState
+} from 'react';
 import ReactDOM from 'react-dom';
-import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
-import MenuItem from '@material-ui/core/MenuItem'
-import Select from '@material-ui/core/Select'
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
-import config from "../config";
-import {CustomThemeContext} from "../CustomThemeProvider";
-import {getNextFWDate, toWMSDate} from "../datemanagement";
-import L from "leaflet";
-import { useStateWithLabel, getWMSLayersYearRange } from "../utils";
+import L from 'leaflet';
+import config from '../config';
+import { CustomThemeContext } from '../CustomThemeProvider';
+import { getNextFWDate, toWMSDate } from '../datemanagement';
+import { useStateWithLabel, getWMSLayersYearRange } from '../utils';
 
-export function BasemapSelect ({ basemaps, basemapIndex, setBasemapIndex }) {
-
-    const onBasemapChange = (event) => {
-        let index = event.target.value
-        setBasemapIndex(index)
-    }
+export const BasemapSelect = ({ basemaps, basemapIndex, setBasemapIndex }) => {
+  const onBasemapChange = (event) => {
+    const index = event.target.value;
+    setBasemapIndex(index);
+  };
 
   return (
-    <FormControl letiant="outlined" style={{marginRight: 16 }}>
+    <FormControl letiant="outlined" style={{ marginRight: 16 }}>
       <InputLabel shrink id="demo-simple-select-placeholder-label-label">
         Basemap
       </InputLabel>
@@ -38,12 +39,12 @@ export function BasemapSelect ({ basemaps, basemapIndex, setBasemapIndex }) {
       {
         basemaps.map((basemap, index) => (
         <MenuItem key={index} value={index}>{basemap.name}</MenuItem>
-      ))
+        ))
     }
     </Select>
     </FormControl>
-  )
-}
+  );
+};
 
 BasemapSelect.propTypes = {
   basemaps: propTypes.array.isRequired,
@@ -51,36 +52,34 @@ BasemapSelect.propTypes = {
   setBasemapIndex: propTypes.function.isRequired
 };
 
-export function ThemeSelect ({ setDarkMode }) {
+export const ThemeSelect = ({ setDarkMode }) => {
+  // theme switching
+  const themesList = config.themesList;
+  const [themeIndex, setThemeIndex] = useStateWithLabel(0, 'themeIndex');
+  const { setTheme } = useContext(CustomThemeContext);
 
-    //theme switching
-    const themesList = config.themesList;
-    const [themeIndex, setThemeIndex] = useStateWithLabel(0, "themeIndex");
-    const {setTheme } = useContext(CustomThemeContext)
+  // State change and event handlers
 
-    // State change and event handlers
-
-    const onThemeChange = (event) => {
-        let index = event.target.value
-        setThemeIndex(index)
-    }
+  const onThemeChange = (event) => {
+    const index = event.target.value;
+    setThemeIndex(index);
+  };
 
   // Hook: Theme change
   useEffect(() => {
-    //console.log(newWMS);
-    let chosenTheme = themesList[themeIndex] // TODO: Find this variable in fcav.js
-    chosenTheme = chosenTheme.toLowerCase()
-//    console.log("chosen theme: " + chosenTheme)
-    setTheme(chosenTheme)
-    if(chosenTheme === 'dark'){
+    // console.log(newWMS);
+    let chosenTheme = themesList[themeIndex]; // TODO: Find this variable in fcav.js
+    chosenTheme = chosenTheme.toLowerCase();
+    //    console.log("chosen theme: " + chosenTheme)
+    setTheme(chosenTheme);
+    if (chosenTheme === 'dark') {
       setDarkMode(true);
-    }
-    else{
+    } else {
       setDarkMode(false);
     }
-  }, [themeIndex])
+  }, [themeIndex]);
   return (
-    <FormControl letiant="outlined" style={{marginRight: 16 }}>
+    <FormControl letiant="outlined" style={{ marginRight: 16 }}>
       <InputLabel shrink id="demo-simple-select-placeholder-label-label">
       Theme
       </InputLabel>
@@ -98,27 +97,28 @@ export function ThemeSelect ({ setDarkMode }) {
       }
       </Select>
     </FormControl>
-  )
-}
+  );
+};
 
 ThemeSelect.propTypes = {
   setDarkMode: propTypes.function.isRequired
 };
 
-export function ProductSelect ({ startDate, endDate, setDateRangeIndex, productIndex, setProductIndex, setWmsLayers }) {
+export const ProductSelect = ({
+  startDate, endDate, setDateRangeIndex, productIndex, setProductIndex, setWmsLayers
+}) => {
+  const productsList = config.productsList;
 
-    const productsList = config.productsList;
-
-    const onProductChange = (event) => {
-        let index = event.target.value
-        setProductIndex(index);
-        let newProduct = getWMSLayersYearRange(startDate, endDate, index);
-        setWmsLayers(newProduct);
-        setDateRangeIndex(0);
-    }
+  const onProductChange = (event) => {
+    const index = event.target.value;
+    setProductIndex(index);
+    const newProduct = getWMSLayersYearRange(startDate, endDate, index);
+    setWmsLayers(newProduct);
+    setDateRangeIndex(0);
+  };
 
   return (
-    <FormControl letiant="outlined" style={{marginRight: 16 }}>
+    <FormControl letiant="outlined" style={{ marginRight: 16 }}>
       <InputLabel shrink id="demo-simple-select-placeholder-label-label">
         Product
       </InputLabel>
@@ -136,8 +136,8 @@ export function ProductSelect ({ startDate, endDate, setDateRangeIndex, productI
         }
       </Select>
     </FormControl>
-  )
-}
+  );
+};
 
 ProductSelect.propTypes = {
   startDate: propTypes.instanceOf(Date).isRequired,

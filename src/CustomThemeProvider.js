@@ -6,8 +6,8 @@ import getTheme from './themeswitcher';
 export const CustomThemeContext = React.createContext(
   {
     currentTheme: 'dark',
-    setTheme: null,
-  },
+    setTheme: null
+  }
 );
 
 const CustomThemeProvider = (props) => {
@@ -31,7 +31,7 @@ const CustomThemeProvider = (props) => {
 
   const contextValue = {
     currentTheme: themeName,
-    setTheme: setThemeName,
+    setTheme: setThemeName
   };
 
   return (

@@ -1,5 +1,5 @@
-import { createMuiTheme } from '@material-ui/core/styles'
-import { red } from '@material-ui/core/colors'
+import { createMuiTheme } from '@material-ui/core/styles';
+import { red } from '@material-ui/core/colors';
 
 // Dark theme
 const theme = createMuiTheme({
@@ -9,23 +9,23 @@ const theme = createMuiTheme({
       main: '#26292C',
       light: 'rgb(81, 91, 95)',
       dark: 'rgb(26, 35, 39)',
-      contrastText: '#ffffff',
+      contrastText: '#ffffff'
     },
     secondary: {
       main: '#ffffff',
       light: 'rgb(255, 197, 112)',
       dark: 'rgb(200, 147, 89)',
-      contrastText: 'rgba(0, 0, 0, 0.87)',
+      contrastText: 'rgba(0, 0, 0, 0.87)'
     },
     appBar: {
       main: '#555555',
-      contrastText: '#ffffff',
+      contrastText: '#ffffff'
     },
     error: {
-      main: red.A400,
+      main: red.A400
     },
-    nemacLogo: './nemac_logo_white.png',
-  },
-})
+    nemacLogo: './nemac_logo_white.png'
+  }
+});
 
-export default theme
+export default theme;

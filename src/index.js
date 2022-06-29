@@ -1,11 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "leaflet/dist/leaflet.css";
-import App from "./App";
-//import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import CustomThemeProvider from './CustomThemeProvider'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import 'leaflet/dist/leaflet.css';
+import App from './App';
+// import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import CustomThemeProvider from './CustomThemeProvider';
 
-/*export const theme = createMuiTheme({
+/* export const theme = createMuiTheme({
   overrides: {
      MuiAppBar: {
        colorPrimary: {
@@ -20,8 +20,8 @@ import CustomThemeProvider from './CustomThemeProvider'
       main: "#e0e0e0"
     }
   }
-});*/
-const rootElement = document.getElementById("app");
+}); */
+const rootElement = document.getElementById('app');
 ReactDOM.render(
   <CustomThemeProvider>
     <App/>,
