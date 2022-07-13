@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import Slider from '@material-ui/core/Slider';
 import DateFnsUtils from '@date-io/date-fns';
-import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
+import PropTypes from 'prop-types';
 import L from 'leaflet';
 import { makeStyles } from '@material-ui/core/styles';
 import { getNextFWDate, toWMSDate } from '../datemanagement';
@@ -119,14 +119,14 @@ export const DateRangePicker = ({
   );
 };
 
-DateRangePicker.propTypes = {
-  startDate: propTypes.instanceOf(Date).isRequired,
-  setStartDate: propTypes.function.isRequired,
-  endDate: propTypes.instanceOf(Date).isRequired,
-  setEndDate: propTypes.function.isRequired,
-  dateRangeIndex: propTypes.number.isRequired,
-  setDateRangeIndex: propTypes.function.isRequired,
-  productIndex: propTypes.number.isRequired,
-  wmsLayers: propTypes.array.isRequired,
-  setWmsLayers: propTypes.function.isRequired
+DateRangePicker.PropTypes = {
+  startDate: PropTypes.instanceOf(Date).isRequired,
+  setStartDate: PropTypes.function.isRequired,
+  endDate: PropTypes.instanceOf(Date).isRequired,
+  setEndDate: PropTypes.function.isRequired,
+  dateRangeIndex: PropTypes.number.isRequired,
+  setDateRangeIndex: PropTypes.function.isRequired,
+  productIndex: PropTypes.number.isRequired,
+  wmsLayers: PropTypes.array.isRequired,
+  setWmsLayers: PropTypes.function.isRequired
 };

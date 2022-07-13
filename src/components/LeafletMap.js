@@ -12,7 +12,7 @@ import 'leaflet-loading';
 import 'leaflet-loading/src/Control.Loading.css';
 import { geosearch } from 'esri-leaflet-geocoder';
 import L from 'leaflet';
-import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
+import PropTypes from 'prop-types';
 import { parse } from 'fast-xml-parser';
 import forwarn2Legend from '../forwarn2-legend.png';
 import config from '../config';
@@ -310,22 +310,22 @@ const MapController = ({
   return null;
 };
 
-MapController.propTypes = {
-  graphOn: propTypes.bool.isRequired,
-  currentGraphCoords: propTypes.array.isRequired,
-  setMap: propTypes.function.isRequired,
-  modisData: propTypes.object.isRequired,
-  setModisData: propTypes.function.isRequired,
-  modisDataConfig: propTypes.object.isRequired,
-  setModisDataConfig: propTypes.function.isRequired,
-  startDate: propTypes.instanceOf(Date).isRequired,
-  endDate: propTypes.instanceOf(Date).isRequired,
-  dateRangeIndex: propTypes.number.isRequired,
-  setDateRangeIndex: propTypes.function.isRequired,
-  basemaps: propTypes.array.isRequired,
-  basemapIndex: propTypes.number.isRequired,
-  productIndex: propTypes.number.isRequired,
-  wmsLayers: propTypes.array.isRequired
+MapController.PropTypes = {
+  graphOn: PropTypes.bool.isRequired,
+  currentGraphCoords: PropTypes.array.isRequired,
+  setMap: PropTypes.function.isRequired,
+  modisData: PropTypes.object.isRequired,
+  setModisData: PropTypes.function.isRequired,
+  modisDataConfig: PropTypes.object.isRequired,
+  setModisDataConfig: PropTypes.function.isRequired,
+  startDate: PropTypes.instanceOf(Date).isRequired,
+  endDate: PropTypes.instanceOf(Date).isRequired,
+  dateRangeIndex: PropTypes.number.isRequired,
+  setDateRangeIndex: PropTypes.function.isRequired,
+  basemaps: PropTypes.array.isRequired,
+  basemapIndex: PropTypes.number.isRequired,
+  productIndex: PropTypes.number.isRequired,
+  wmsLayers: PropTypes.array.isRequired
 };
 
 export const LeafletMap = ({
@@ -421,15 +421,15 @@ export const LeafletMap = ({
   );
 };
 
-LeafletMap.propTypes = {
-  graphOn: propTypes.bool.isRequired,
-  setMap: propTypes.function.isRequired,
-  startDate: propTypes.instanceOf(Date).isRequired,
-  endDate: propTypes.instanceOf(Date).isRequired,
-  dateRangeIndex: propTypes.number.isRequired,
-  setDateRangeIndex: propTypes.function.isRequired,
-  basemaps: propTypes.array.isRequired,
-  basemapIndex: propTypes.number.isRequired,
-  productIndex: propTypes.number.isRequired,
-  wmsLayers: propTypes.array.isRequired
+LeafletMap.PropTypes = {
+  graphOn: PropTypes.bool.isRequired,
+  setMap: PropTypes.function.isRequired,
+  startDate: PropTypes.instanceOf(Date).isRequired,
+  endDate: PropTypes.instanceOf(Date).isRequired,
+  dateRangeIndex: PropTypes.number.isRequired,
+  setDateRangeIndex: PropTypes.function.isRequired,
+  basemaps: PropTypes.array.isRequired,
+  basemapIndex: PropTypes.number.isRequired,
+  productIndex: PropTypes.number.isRequired,
+  wmsLayers: PropTypes.array.isRequired
 };

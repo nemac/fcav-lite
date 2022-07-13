@@ -3,7 +3,7 @@ import StopIcon from '@material-ui/icons/Stop';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import React, { useDebugValue, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
+import PropTypes from 'prop-types';
 import L from 'leaflet';
 
 export const GraphButton = ({ graphOn, setGraphOn, map }) => {
@@ -35,8 +35,8 @@ export const GraphButton = ({ graphOn, setGraphOn, map }) => {
   );
 };
 
-GraphButton.propTypes = {
-  graphOn: propTypes.bool.isRequired,
-  setGraphOn: propTypes.function.isRequired,
-  map: propTypes.instanceOf(L.Map).isRequired
+GraphButton.PropTypes = {
+  graphOn: PropTypes.bool.isRequired,
+  setGraphOn: PropTypes.function.isRequired,
+  map: PropTypes.instanceOf(L.Map).isRequired
 };

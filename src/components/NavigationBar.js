@@ -10,7 +10,7 @@ Theme - DropdownSelector.js
 */
 import React, { useDebugValue, useState } from 'react';
 import ReactDOM from 'react-dom';
-import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
+import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { Grid } from '@material-ui/core';
@@ -58,21 +58,21 @@ export const NavigationBar = ({
   );
 };
 
-NavigationBar.propTypes = {
-  graphOn: propTypes.bool.isRequired,
-  setGraphOn: propTypes.function.isRequired,
-  map: propTypes.instanceOf(L.Map).isRequired,
-  startDate: propTypes.instanceOf(Date).isRequired,
-  setStartDate: propTypes.function.isRequired,
-  endDate: propTypes.instanceOf(Date).isRequired,
-  setEndDate: propTypes.function.isRequired,
-  dateRangeIndex: propTypes.number.isRequired,
-  setDateRangeIndex: propTypes.function.isRequired,
-  basemaps: propTypes.array.isRequired,
-  basemapIndex: propTypes.number.isRequired,
-  setBasemapIndex: propTypes.function.isRequired,
-  productIndex: propTypes.number.isRequired,
-  setProductIndex: propTypes.function.isRequired,
-  wmsLayers: propTypes.array.isRequired,
-  setWmsLayers: propTypes.function.isRequired
+NavigationBar.PropTypes = {
+  graphOn: PropTypes.bool.isRequired,
+  setGraphOn: PropTypes.function.isRequired,
+  map: PropTypes.instanceOf(L.Map).isRequired,
+  startDate: PropTypes.instanceOf(Date).isRequired,
+  setStartDate: PropTypes.function.isRequired,
+  endDate: PropTypes.instanceOf(Date).isRequired,
+  setEndDate: PropTypes.function.isRequired,
+  dateRangeIndex: PropTypes.number.isRequired,
+  setDateRangeIndex: PropTypes.function.isRequired,
+  basemaps: PropTypes.array.isRequired,
+  basemapIndex: PropTypes.number.isRequired,
+  setBasemapIndex: PropTypes.function.isRequired,
+  productIndex: PropTypes.number.isRequired,
+  setProductIndex: PropTypes.function.isRequired,
+  wmsLayers: PropTypes.array.isRequired,
+  setWmsLayers: PropTypes.function.isRequired
 };

@@ -26,6 +26,7 @@
     "leaflet": "^1.7.1",
     "leaflet-control-topcenter": "git+https://github.com/FCOO/leaflet-control-topcenter.git",
     "leaflet-loading": "^0.1.24",
+    "prop-types": "^15.8.1",
     "react": "^18.0.0",
     "react-chartjs-2": "^3.0.5",
     "react-dom": "^18.0.0",

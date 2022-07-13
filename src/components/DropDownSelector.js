@@ -11,7 +11,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
+import PropTypes from 'prop-types';
 import L from 'leaflet';
 import config from '../config';
 import { CustomThemeContext } from '../CustomThemeProvider';
@@ -73,10 +73,10 @@ export const BasemapSelect = ({ basemaps, basemapIndex, setBasemapIndex }) => {
   );
 };
 
-BasemapSelect.propTypes = {
-  basemaps: propTypes.array.isRequired,
-  basemapIndex: propTypes.number.isRequired,
-  setBasemapIndex: propTypes.function.isRequired
+BasemapSelect.PropTypes = {
+  basemaps: PropTypes.array.isRequired,
+  basemapIndex: PropTypes.number.isRequired,
+  setBasemapIndex: PropTypes.function.isRequired
 };
 
 export const ThemeSelect = ({ setDarkMode }) => {
@@ -127,8 +127,8 @@ export const ThemeSelect = ({ setDarkMode }) => {
   );
 };
 
-ThemeSelect.propTypes = {
-  setDarkMode: propTypes.function.isRequired
+ThemeSelect.PropTypes = {
+  setDarkMode: PropTypes.function.isRequired
 };
 
 export const ProductSelect = ({
@@ -166,11 +166,11 @@ export const ProductSelect = ({
   );
 };
 
-ProductSelect.propTypes = {
-  startDate: propTypes.instanceOf(Date).isRequired,
-  endDate: propTypes.instanceOf(Date).isRequired,
-  setDateRangeIndex: propTypes.function.isRequired,
-  productIndex: propTypes.number.isRequired,
-  setProductIndex: propTypes.function.isRequired,
-  setWmsLayers: propTypes.function.isRequired
+ProductSelect.PropTypes = {
+  startDate: PropTypes.instanceOf(Date).isRequired,
+  endDate: PropTypes.instanceOf(Date).isRequired,
+  setDateRangeIndex: PropTypes.function.isRequired,
+  productIndex: PropTypes.number.isRequired,
+  setProductIndex: PropTypes.function.isRequired,
+  setWmsLayers: PropTypes.function.isRequired
 };

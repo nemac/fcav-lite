@@ -8,7 +8,7 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { Line } from 'react-chartjs-2';
 import { makeStyles } from '@material-ui/core/styles';
-import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
+import PropTypes from 'prop-types';
 
 export const NDVIMultiYearGraph = ({ graphOn, modisData, modisDataConfig }) => {
   const useStyles = makeStyles({
@@ -56,8 +56,8 @@ export const NDVIMultiYearGraph = ({ graphOn, modisData, modisDataConfig }) => {
   );
 };
 
-NDVIMultiYearGraph.propTypes = {
-  graphOn: propTypes.bool.isRequired,
-  modisData: propTypes.object.isRequired,
-  modisDataConfig: propTypes.object.isRequired
+NDVIMultiYearGraph.PropTypes = {
+  graphOn: PropTypes.bool.isRequired,
+  modisData: PropTypes.object.isRequired,
+  modisDataConfig: PropTypes.object.isRequired
 };
