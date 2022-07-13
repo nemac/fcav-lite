@@ -15,12 +15,6 @@
     "chart.js": "^3.5.1",
     "chartjs-plugin-annotation": "^1.0.2",
     "date-fns": "^2.16.1",
-    "eslint": "^8.18.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.30.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
     "esri-leaflet-geocoder": "^3.1.1",
     "fast-xml-parser": "^3.20.3",
     "leaflet": "^1.7.1",
@@ -33,9 +27,9 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
@@ -57,6 +51,8 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^2.2.0"
+    "gh-pages": "^2.2.0",
+    "react-app-rewired": "^2.2.1",
+    "react-error-overlay": "^6.0.9"
   }
 }

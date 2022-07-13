@@ -18,6 +18,33 @@ import { CustomThemeContext } from '../CustomThemeProvider';
 import { getNextFWDate, toWMSDate } from '../datemanagement';
 import { useStateWithLabel, getWMSLayersYearRange } from '../utils';
 
+export const DropDownSelector = ({
+  buttonText, labelId, id, value, onChange, label, options, hook, dependencies
+}) => {
+  useEffect(hook, dependencies);
+
+  return (
+    <FormControl letiant="outlined" style={{ marginRight: 16 }}>
+      <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+        {buttonText}
+      </InputLabel>
+      <Select
+        labelId={labelId}
+        id={id}
+        value={value}
+        onChange={onChange}
+        label={label}
+      >
+      {
+        options.map((option, index) => (
+        <MenuItem key={index} value={index}>{option.name}</MenuItem>
+        ))
+    }
+    </Select>
+    </FormControl>
+  );
+};
+
 export const BasemapSelect = ({ basemaps, basemapIndex, setBasemapIndex }) => {
   const onBasemapChange = (event) => {
     const index = event.target.value;
