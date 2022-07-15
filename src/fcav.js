@@ -36,21 +36,6 @@ import 'leaflet-loading/src/Control.Loading.css'
 import {geosearch} from 'esri-leaflet-geocoder'
 import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
 import {Line} from 'react-chartjs-2'
-import { parse } from 'fast-xml-parser';
-import { Chart } from 'chart.js';
- import annotationPlugin from 'chartjs-plugin-annotation'
-Chart.register(annotationPlugin);
-
-// Map Defaults
-const center = [35, -82]
-const zoom = 13
-
-function useStateWithLabel(initialValue, name) {
-  const [value, setValue] = useState(initialValue)
-  useDebugValue(`${name}: ${value}`)
-  return [value, setValue]
-}
-
 const getLayerRangeByDate = (startDate, endDate, wmsLayers) => {
   let startIndex = -1
   let endIndex = -1
@@ -265,6 +250,7 @@ export function App(props) {
     let index = event.target.value
     setBasemapIndex(index)
   }
+
   const onThemeChange = (event) => {
     let index = event.target.value
     setThemeIndex(index)
@@ -450,7 +436,7 @@ export function App(props) {
     return dateIndex;
   }
 
-  function MapController () {
+  export function MapController () {
     const search = geosearch()
     const map = useMap()
     setMap(map);
@@ -695,118 +681,11 @@ function DateRangePicker () {
   )
 }
 
-
-function BasemapSelect () {
-
-  return (
-    <FormControl letiant="outlined" style={{marginRight: 16 }}>
-      <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-        Basemap
-      </InputLabel>
-      <Select
-        labelId="fcav-basemap-select-label"
-        id="fcav-basemap-select"
-        value={basemapIndex}
-        onChange={onBasemapChange}
-        label="Product"
-      >
-      {
-        basemaps.map((basemap, index) => (
-        <MenuItem key={index} value={index}>{basemap.name}</MenuItem>
-      ))
-    }
-    </Select>
-    </FormControl>
-  )
-}
-function ThemeSelect () {
-  // Hook: Theme change
-  useEffect(() => {
-    //console.log(newWMS);
-    let chosenTheme = themesList[themeIndex]
-    chosenTheme = chosenTheme.toLowerCase()
-//    console.log("chosen theme: " + chosenTheme)
-    setTheme(chosenTheme)
-    if(chosenTheme === 'dark'){
-      setDarkMode(true);
-    }
-    else{
-      setDarkMode(false);
-    }
-  }, [themeIndex])
-  return (
-    <FormControl letiant="outlined" style={{marginRight: 16 }}>
-      <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-      Theme
-      </InputLabel>
-      <Select
-        labelId="fcav-theme-select-label"
-        id="fcav-theme-select"
-        value={themeIndex}
-        onChange={onThemeChange}
-        label="Theme"
-      >
-      {
-        themesList.map((theme, index) => (
-          <MenuItem key={index} value={index}>{theme}</MenuItem>
-        ))
-      }
-      </Select>
-    </FormControl>
-  )
-}
-function ProductSelect () {
-
-  return (
-    <FormControl letiant="outlined" style={{marginRight: 16 }}>
-      <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-        Product
-      </InputLabel>
-      <Select
-        labelId="fcav-product-select-label"
-        id="fcav-product-select"
-        value={productIndex}
-        onChange={onProductChange}
-        label="Product"
-      >
-        {
-          productsList.map((product, index) => (
-            <MenuItem key={index} value={index}>{product}</MenuItem>
-          ))
-        }
-      </Select>
-    </FormControl>
-  )
-}
-
-function TopBar () {
-  return (
-    //<ThemeProvider theme={fcavtheme}>
-    <Grid item xs={12}>
-      <AppBar
-      //id='menu'
-      position="static"
-      style={{ zIndex: '0', flexWrap: 'flex', flexDirection: 'column'}}
-      >
-        <Toolbar>
-          <img src={ darkMode ? nemacLogoWhite : nemacLogoBlack} width="150" alt="your mom"></img>
-          <BasemapSelect/>
-          <DateRangePicker/>
-          <ProductSelect/>
-          <ThemeSelect/>
-          <GraphBtn/>
-        </Toolbar>
-      </AppBar>
-    </Grid>
-    //</ThemeProvider>
-  )
-}
-
 // App
 return (
   <div>
     <Grid container>
-      <TopBar/>
+      <NavigationBar/>
       <Grid item xs={12}>
         <MapContainer
           className='mapContainer'

@@ -1,11 +1,11 @@
-import light from './light'
-import dark from './dark'
+import light from './light';
+import dark from './dark';
 
 const themes = {
   light,
-  dark,
-}
+  dark
+};
 
-export default function getTheme(theme) {
-  return themes[theme]
-}
+const getTheme = (theme) => themes[theme];
+
+export default getTheme;
