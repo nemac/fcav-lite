@@ -119,14 +119,14 @@ export const DateRangePicker = ({
   );
 };
 
-DateRangePicker.PropTypes = {
+DateRangePicker.propTypes = {
   startDate: PropTypes.instanceOf(Date).isRequired,
-  setStartDate: PropTypes.function.isRequired,
+  setStartDate: PropTypes.func.isRequired,
   endDate: PropTypes.instanceOf(Date).isRequired,
-  setEndDate: PropTypes.function.isRequired,
+  setEndDate: PropTypes.func.isRequired,
   dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.function.isRequired,
+  setDateRangeIndex: PropTypes.func.isRequired,
   productIndex: PropTypes.number.isRequired,
   wmsLayers: PropTypes.array.isRequired,
-  setWmsLayers: PropTypes.function.isRequired
+  setWmsLayers: PropTypes.func.isRequired
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
-import propTypes from 'eslint-plugin-react/lib/rules/prop-types';
+import PropTypes from 'prop-types';
 
 export const AnimationController = ({ layers, go }) => {
   const [index, setIndex] = useState(null);
@@ -55,6 +55,6 @@ export const AnimationController = ({ layers, go }) => {
 };
 
 AnimationController.propTypes = {
-  layers: propTypes.array.isRequired,
-  go: propTypes.bool.isRequired
+  layers: PropTypes.array.isRequired,
+  go: PropTypes.bool.isRequired
 };

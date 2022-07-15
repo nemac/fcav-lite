@@ -73,10 +73,10 @@ export const BasemapSelect = ({ basemaps, basemapIndex, setBasemapIndex }) => {
   );
 };
 
-BasemapSelect.PropTypes = {
+BasemapSelect.propTypes = {
   basemaps: PropTypes.array.isRequired,
   basemapIndex: PropTypes.number.isRequired,
-  setBasemapIndex: PropTypes.function.isRequired
+  setBasemapIndex: PropTypes.func.isRequired
 };
 
 export const ThemeSelect = ({ setDarkMode }) => {
@@ -127,8 +127,8 @@ export const ThemeSelect = ({ setDarkMode }) => {
   );
 };
 
-ThemeSelect.PropTypes = {
-  setDarkMode: PropTypes.function.isRequired
+ThemeSelect.propTypes = {
+  setDarkMode: PropTypes.func.isRequired
 };
 
 export const ProductSelect = ({
@@ -166,11 +166,11 @@ export const ProductSelect = ({
   );
 };
 
-ProductSelect.PropTypes = {
+ProductSelect.propTypes = {
   startDate: PropTypes.instanceOf(Date).isRequired,
   endDate: PropTypes.instanceOf(Date).isRequired,
-  setDateRangeIndex: PropTypes.function.isRequired,
+  setDateRangeIndex: PropTypes.func.isRequired,
   productIndex: PropTypes.number.isRequired,
-  setProductIndex: PropTypes.function.isRequired,
-  setWmsLayers: PropTypes.function.isRequired
+  setProductIndex: PropTypes.func.isRequired,
+  setWmsLayers: PropTypes.func.isRequired
 };

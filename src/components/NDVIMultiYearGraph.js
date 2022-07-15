@@ -56,7 +56,7 @@ export const NDVIMultiYearGraph = ({ graphOn, modisData, modisDataConfig }) => {
   );
 };
 
-NDVIMultiYearGraph.PropTypes = {
+NDVIMultiYearGraph.propTypes = {
   graphOn: PropTypes.bool.isRequired,
   modisData: PropTypes.object.isRequired,
   modisDataConfig: PropTypes.object.isRequired

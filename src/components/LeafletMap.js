@@ -310,18 +310,18 @@ const MapController = ({
   return null;
 };
 
-MapController.PropTypes = {
+MapController.propTypes = {
   graphOn: PropTypes.bool.isRequired,
   currentGraphCoords: PropTypes.array.isRequired,
-  setMap: PropTypes.function.isRequired,
+  setMap: PropTypes.func.isRequired,
   modisData: PropTypes.object.isRequired,
-  setModisData: PropTypes.function.isRequired,
+  setModisData: PropTypes.func.isRequired,
   modisDataConfig: PropTypes.object.isRequired,
-  setModisDataConfig: PropTypes.function.isRequired,
+  setModisDataConfig: PropTypes.func.isRequired,
   startDate: PropTypes.instanceOf(Date).isRequired,
   endDate: PropTypes.instanceOf(Date).isRequired,
   dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.function.isRequired,
+  setDateRangeIndex: PropTypes.func.isRequired,
   basemaps: PropTypes.array.isRequired,
   basemapIndex: PropTypes.number.isRequired,
   productIndex: PropTypes.number.isRequired,
@@ -421,13 +421,13 @@ export const LeafletMap = ({
   );
 };
 
-LeafletMap.PropTypes = {
+LeafletMap.propTypes = {
   graphOn: PropTypes.bool.isRequired,
-  setMap: PropTypes.function.isRequired,
+  setMap: PropTypes.func.isRequired,
   startDate: PropTypes.instanceOf(Date).isRequired,
   endDate: PropTypes.instanceOf(Date).isRequired,
   dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.function.isRequired,
+  setDateRangeIndex: PropTypes.func.isRequired,
   basemaps: PropTypes.array.isRequired,
   basemapIndex: PropTypes.number.isRequired,
   productIndex: PropTypes.number.isRequired,

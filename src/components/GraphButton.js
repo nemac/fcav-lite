@@ -35,8 +35,8 @@ export const GraphButton = ({ graphOn, setGraphOn, map }) => {
   );
 };
 
-GraphButton.PropTypes = {
+GraphButton.propTypes = {
   graphOn: PropTypes.bool.isRequired,
-  setGraphOn: PropTypes.function.isRequired,
+  setGraphOn: PropTypes.func.isRequired,
   map: PropTypes.instanceOf(L.Map).isRequired
 };
