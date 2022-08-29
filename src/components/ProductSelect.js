@@ -21,7 +21,7 @@ export const ProductSelect = ({
   
     return (
         <DropDownSelector buttonText={'Product'} labelId={'fcav-product-select-label'} id={'fcav-product-select'}
-        value={productIndex} onChange={onProductChange} options={productsList} getOptionName={option => option} />
+        value={productIndex} onChange={onProductChange} options={productsList} />
     );
   };
 

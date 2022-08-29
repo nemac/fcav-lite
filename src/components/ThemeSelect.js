@@ -36,7 +36,7 @@ export const ThemeSelect = ({ setDarkMode }) => {
     
     return (
         <DropDownSelector buttonText={'Theme'} labelId={'fcav-theme-select-label'} id={'fcav-theme-select'}
-        value={themeIndex} onChange={onThemeChange} options={themesList} getOptionName={option => option} />
+        value={themeIndex} onChange={onThemeChange} options={themesList} />
     );
   };
 

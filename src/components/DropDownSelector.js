@@ -35,7 +35,7 @@ export const DropDownSelector = ({
       >
       {
         options.map((option, index) => (
-        <MenuItem key={index} value={index}>{getOptionName(option)}</MenuItem>
+        <MenuItem key={index} value={index}>{getOptionName != undefined ? getOptionName(option) : option}</MenuItem>
         ))
     }
     </Select>
@@ -51,5 +51,5 @@ DropDownSelector.propTypes = {
   onChange: PropTypes.func.isRequired,
   label: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
-  getOptionName: PropTypes.func.isRequired
+  getOptionName: PropTypes.func
 };
