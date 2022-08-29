@@ -1,12 +1,12 @@
 /*
 This component will be a high level
 component that encapsulates the following:
-Basemap Dropdown - DropdownSelector.js
+Basemap Dropdown - BasemapSelect.js
 Start Date - Datepicker.js
 Animation Slider - AnimationSlider.js
 End Date - Datepicker.js
-Product - DropdownSelector.js
-Theme - DropdownSelector.js
+Product - ProductSelect.js
+Theme - ThemeSelect.js
 */
 import React, { useDebugValue, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -16,7 +16,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import { Grid } from '@material-ui/core';
 import L from 'leaflet';
 import { makeStyles } from '@material-ui/core/styles';
-import { BasemapSelect, ThemeSelect, ProductSelect } from './DropDownSelector';
+import { BasemapSelect } from './BasemapSelect';
+import { ThemeSelect } from './ThemeSelect';
+import { ProductSelect } from './ProductSelect';
 import { DateRangePicker } from './Datepicker';
 import { GraphButton } from './GraphButton';
 import nemacLogoWhite from '../nemac_logo_white.png';
