@@ -29,6 +29,8 @@ const App = () => {
     'fullWMSLayers'
   );
 
+  const [animating, setAnimating] = useStateWithLabel(false, 'animating');
+
   return (
       <div>
           <NavigationBar graphOn={graphOn} setGraphOn={setGraphOn} map={map} startDate={startDate}
@@ -37,11 +39,12 @@ const App = () => {
                          basemaps={basemaps} basemapIndex={basemapIndex}
                          setBasemapIndex={setBasemapIndex} productIndex={productIndex}
                          setProductIndex={setProductIndex} wmsLayers={wmsLayers}
-                         setWmsLayers={setWmsLayers} />
+                         setWmsLayers={setWmsLayers} animating={animating}
+                         setAnimating={setAnimating} />
           <LeafletMap graphOn={graphOn} setMap={setMap} startDate={startDate} endDate={endDate}
                       dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex}
                       basemaps={basemaps} basemapIndex={basemapIndex} productIndex={productIndex}
-                      wmsLayers={wmsLayers} />
+                      wmsLayers={wmsLayers} animating={animating} />
       </div>
   );
 };

@@ -20,6 +20,7 @@ import { BasemapSelect } from './BasemapSelect';
 import { ThemeSelect } from './ThemeSelect';
 import { ProductSelect } from './ProductSelect';
 import { DateRangePicker } from './Datepicker';
+import { AnimateButton } from './AnimateButton';
 import { GraphButton } from './GraphButton';
 import nemacLogoWhite from '../nemac_logo_white.png';
 import nemacLogoBlack from '../nemac_logo_black.png';
@@ -28,7 +29,7 @@ import { useStateWithLabel } from '../utils';
 export const NavigationBar = ({
   graphOn, setGraphOn, map, startDate, setStartDate, endDate, setEndDate,
   dateRangeIndex, setDateRangeIndex, basemaps, basemapIndex, setBasemapIndex,
-  productIndex, setProductIndex, wmsLayers, setWmsLayers
+  productIndex, setProductIndex, wmsLayers, setWmsLayers, animating, setAnimating
 }) => {
   const [darkMode, setDarkMode] = useStateWithLabel(true);
 
@@ -52,6 +53,7 @@ export const NavigationBar = ({
                          setDateRangeIndex={setDateRangeIndex} productIndex={productIndex}
                          setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} />
           <ThemeSelect setDarkMode={setDarkMode} />
+          <AnimateButton animating={animating} setAnimating={setAnimating} />
           <GraphButton graphOn={graphOn} setGraphOn={setGraphOn} map={map} />
         </Toolbar>
       </AppBar>
@@ -76,5 +78,7 @@ NavigationBar.propTypes = {
   productIndex: PropTypes.number.isRequired,
   setProductIndex: PropTypes.func.isRequired,
   wmsLayers: PropTypes.array.isRequired,
-  setWmsLayers: PropTypes.func.isRequired
+  setWmsLayers: PropTypes.func.isRequired,
+  animating: PropTypes.bool.isRequired,
+  setAnimating: PropTypes.func.isRequired
 };

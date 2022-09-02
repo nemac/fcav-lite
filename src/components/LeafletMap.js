@@ -21,13 +21,13 @@ import { NDVIMultiYearGraph } from './NDVIMultiYearGraph';
 import { useStateWithLabel, useCompare } from '../utils';
 
 // Map Defaults
-const center = [35, -82];
-const zoom = 13;
+const center = [37, -98];
+const zoom = 4.5;
 
 const MapController = ({
   graphOn, currentGraphCoords, setMap, modisData, setModisData, modisDataConfig,
   setModisDataConfig, startDate, endDate, dateRangeIndex, setDateRangeIndex, basemaps,
-  basemapIndex, productIndex, wmsLayers
+  basemapIndex, productIndex, wmsLayers, animating
 }) => {
   const search = geosearch();
 
@@ -46,8 +46,6 @@ const MapController = ({
   const hasStartDateChanged = useCompare(startDate);
   const hasEndDateChanged = useCompare(endDate);
   const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
-
-  const [animating, setAnimating] = useStateWithLabel(false);
 
   const hasGraphCoordsChanged = useCompare(currentGraphCoords);
 
@@ -325,12 +323,13 @@ MapController.propTypes = {
   basemaps: PropTypes.array.isRequired,
   basemapIndex: PropTypes.number.isRequired,
   productIndex: PropTypes.number.isRequired,
-  wmsLayers: PropTypes.array.isRequired
+  wmsLayers: PropTypes.array.isRequired,
+  animating: PropTypes.bool.isRequired
 };
 
 export const LeafletMap = ({
   graphOn, setMap, startDate, endDate, dateRangeIndex, setDateRangeIndex,
-  basemaps, basemapIndex, productIndex, wmsLayers
+  basemaps, basemapIndex, productIndex, wmsLayers, animating
 }) => {
   const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0, 0], 'currentGraphCoords');
   const [mapHeight, setMapHeight] = useStateWithLabel('90vh', 'mapHeight');
@@ -412,7 +411,7 @@ export const LeafletMap = ({
                                    endDate={endDate} dateRangeIndex={dateRangeIndex}
                                    setDateRangeIndex={setDateRangeIndex} basemaps={basemaps}
                                    basemapIndex={basemapIndex} productIndex={productIndex}
-                                   wmsLayers={wmsLayers} />
+                                   wmsLayers={wmsLayers} animating={animating} />
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}
@@ -431,5 +430,6 @@ LeafletMap.propTypes = {
   basemaps: PropTypes.array.isRequired,
   basemapIndex: PropTypes.number.isRequired,
   productIndex: PropTypes.number.isRequired,
-  wmsLayers: PropTypes.array.isRequired
+  wmsLayers: PropTypes.array.isRequired,
+  animating: PropTypes.bool.isRequired
 };

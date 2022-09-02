@@ -35,7 +35,7 @@ export const DropDownSelector = ({
       >
       {
         options.map((option, index) => (
-        <MenuItem key={index} value={index}>{getOptionName == undefined ? option : getOptionName(option)}</MenuItem>
+        <MenuItem key={index} value={index}>{getOptionName === undefined ? option : getOptionName(option)}</MenuItem>
         ))
     }
     </Select>
