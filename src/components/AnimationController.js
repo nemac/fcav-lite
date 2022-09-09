@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
 
-export const AnimationController = ({ layers, go }) => {
+export const AnimationController = ({ layers, go, animating }) => {
   const [index, setIndex] = useState(null);
   const context = useLeafletContext();
 
   // Frame update
   useEffect(() => {
+    if (!animating) {
+      return;
+    }
+    console.log("Updating frame.");
     if (index === null) return;
     const layer = layers[index];
     layers.forEach((_layer) => {
@@ -19,7 +23,7 @@ export const AnimationController = ({ layers, go }) => {
       setIndex(newIndex);
     }, 1000);
     return () => { clearTimeout(timer); };
-  }, [index]);
+  }, [animating, index]);
 
   // Initial load
   useEffect(() => {

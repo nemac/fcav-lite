@@ -49,7 +49,6 @@ DropDownSelector.propTypes = {
   id: PropTypes.string.isRequired,
   value: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
-  label: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
   getOptionName: PropTypes.func
 };

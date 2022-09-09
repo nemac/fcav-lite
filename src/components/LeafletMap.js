@@ -18,6 +18,7 @@ import forwarn2Legend from '../forwarn2-legend.png';
 import config from '../config';
 import { getNextFWDate, toWMSDate } from '../datemanagement';
 import { NDVIMultiYearGraph } from './NDVIMultiYearGraph';
+import { AnimationController } from './AnimationController';
 import { useStateWithLabel, useCompare } from '../utils';
 
 // Map Defaults
@@ -32,7 +33,10 @@ const MapController = ({
   const search = geosearch();
 
   const map = useMap();
-  setMap(map);
+
+  useEffect(() => {
+    setMap(map);
+  }, []);
 
   const basemapRef = useRef();
 
@@ -412,6 +416,7 @@ export const LeafletMap = ({
                                    setDateRangeIndex={setDateRangeIndex} basemaps={basemaps}
                                    basemapIndex={basemapIndex} productIndex={productIndex}
                                    wmsLayers={wmsLayers} animating={animating} />
+                    <AnimationController layers={wmsLayers} go={true} animating={animating} />
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}
