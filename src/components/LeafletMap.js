@@ -261,15 +261,15 @@ const MapController = ({
   }, [hasDateRangeIndexChanged, dateRangeIndex, productIndex]);
 
   // Hook: Animation button clicked - add all layers to the map
-  useEffect(() => {
-    if (!animating) { return; }
-    wmsLayers.forEach((layer) => {
-      layer.leafletLayer.setOpacity(0);
-      if (!map.hasLayer(layer.leafletLayer)) {
-        map.addLayer(layer.leafletLayer);
-      }
-    });
-  }, [animating]);
+  // useEffect(() => {
+  //   if (!animating) { return; }
+  //   wmsLayers.forEach((layer) => {
+  //     layer.leafletLayer.setOpacity(0);
+  //     if (!map.hasLayer(layer.leafletLayer)) {
+  //       map.addLayer(layer.leafletLayer);
+  //     }
+  //   });
+  // }, [animating]);
   // hook: has date range changed - update graph data range
   useEffect(() => {
     if (hasStartDateChanged || hasEndDateChanged) {

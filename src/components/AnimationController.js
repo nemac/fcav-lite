@@ -18,16 +18,21 @@ export const AnimationController = ({ layers, go, animating }) => {
       _layer.leafletLayer.bringToBack();
     });
     layer.leafletLayer.bringToFront();
+    layer.leafletLayer.setOpacity(1);
     const newIndex = (index + 1) === layers.length ? 0 : index + 1;
     const timer = setTimeout(() => {
       setIndex(newIndex);
+      layer.leafletLayer.setOpacity(0);
     }, 1000);
     return () => { clearTimeout(timer); };
   }, [animating, index]);
 
   // Initial load
   useEffect(() => {
-    if (!go) return;
+    if (!go) {
+      return;
+    }
+    
     let layersToLoad = layers.length;
     layers.forEach((layer) => {
       layer.leafletLayer.setOpacity(0);
@@ -41,8 +46,8 @@ export const AnimationController = ({ layers, go, animating }) => {
       }
       console.log('Moving layer to the back...');
       layer.leafletLayer.bringToBack();
-      console.log('Setting opacity to 1...');
-      layer.leafletLayer.setOpacity(1);
+      //console.log('Setting opacity to 1...');
+      //layer.leafletLayer.setOpacity(1);
       layer.leafletLayer.on('load', () => {
         console.log('loaded');
         layersToLoad--;
@@ -60,5 +65,6 @@ export const AnimationController = ({ layers, go, animating }) => {
 
 AnimationController.propTypes = {
   layers: PropTypes.array.isRequired,
-  go: PropTypes.bool.isRequired
+  go: PropTypes.bool.isRequired,
+  animating: PropTypes.bool.isRequired
 };
