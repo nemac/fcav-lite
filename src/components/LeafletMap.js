@@ -228,8 +228,13 @@ const MapController = ({
     }
   }, [hasProductIndexChanged, productIndex]);
 
-  // Hook: date range index change
+  // Hook: date range and product change
   useEffect(() => {
+    // if animating, we don't want to do this
+    if (animating) {
+      return;
+    }
+    
     if (hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged) {
       //        console.log("date range index hook");
       clearMap();
@@ -242,13 +247,6 @@ const MapController = ({
       }
       layer.leafletLayer.bringToFront();
       layer.leafletLayer.setOpacity(1);
-      if (animating) {
-        const newIndex = (dateRangeIndex + 1) === wmsLayers.length ? 0 : dateRangeIndex + 1;
-        const timer = setTimeout(() => {
-          setDateRangeIndex(newIndex);
-        }, 10000);
-        return () => { if (timer) clearTimeout(timer); };
-      }
       if (graphOn) {
         // chartLineValue();
         const newLineValue = { ...modisDataConfig };
@@ -416,7 +414,7 @@ export const LeafletMap = ({
                                    setDateRangeIndex={setDateRangeIndex} basemaps={basemaps}
                                    basemapIndex={basemapIndex} productIndex={productIndex}
                                    wmsLayers={wmsLayers} animating={animating} />
-                    <AnimationController layers={wmsLayers} go={true} animating={animating} />
+                    <AnimationController layers={wmsLayers} animating={animating} dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex} />
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}

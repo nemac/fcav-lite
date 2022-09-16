@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
 
-export const AnimationController = ({ layers, go, animating }) => {
-  const [index, setIndex] = useState(null);
+export const AnimationController = ({ layers, animating, dateRangeIndex, setDateRangeIndex }) => {
   const context = useLeafletContext();
 
   // Frame update
@@ -11,60 +10,54 @@ export const AnimationController = ({ layers, go, animating }) => {
     if (!animating) {
       return;
     }
-    console.log("Updating frame.");
-    if (index === null) return;
-    const layer = layers[index];
+    console.log('Updating frame.');
+    if (dateRangeIndex === null) return;
+    const layer = layers[dateRangeIndex];
     layers.forEach((_layer) => {
       _layer.leafletLayer.bringToBack();
     });
     layer.leafletLayer.bringToFront();
     layer.leafletLayer.setOpacity(1);
-    const newIndex = (index + 1) === layers.length ? 0 : index + 1;
     const timer = setTimeout(() => {
-      setIndex(newIndex);
+      setDateRangeIndex(prevDateRangeIndex => (prevDateRangeIndex + 1) === layers.length ? 0 : prevDateRangeIndex + 1);
       layer.leafletLayer.setOpacity(0);
     }, 1000);
     return () => { clearTimeout(timer); };
-  }, [animating, index]);
+  }, [animating, dateRangeIndex]);
 
   // Initial load
   useEffect(() => {
-    if (!go) {
+    if (!animating) {
       return;
     }
-    
-    let layersToLoad = layers.length;
+    let layersToLoad = 0;
     layers.forEach((layer) => {
-      layer.leafletLayer.setOpacity(0);
       if (!context.map.hasLayer(layer.leafletLayer)) {
         console.log('Adding layer to map with opacity 0...');
         console.log(layer);
+        layer.leafletLayer.setOpacity(0);
         context.map.addLayer(layer.leafletLayer);
+        layersToLoad++;
       } else {
         console.log('Layer is already on the map: ');
         console.log(layer);
       }
-      console.log('Moving layer to the back...');
-      layer.leafletLayer.bringToBack();
-      //console.log('Setting opacity to 1...');
-      //layer.leafletLayer.setOpacity(1);
       layer.leafletLayer.on('load', () => {
         console.log('loaded');
         layersToLoad--;
         console.log(layersToLoad);
         if (layersToLoad === 0) {
           console.log('All layers loaded.');
-          setIndex(0);
+          setDateRangeIndex(0);
         }
       });
     });
-  }, []);
+  }, [layers, animating]);
 
   return null;
 };
 
 AnimationController.propTypes = {
   layers: PropTypes.array.isRequired,
-  go: PropTypes.bool.isRequired,
   animating: PropTypes.bool.isRequired
 };

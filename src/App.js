@@ -14,7 +14,7 @@ const App = () => {
 
   const [map, setMap] = useStateWithLabel('', 'map');
 
-  const [startDate, setStartDate] = useStateWithLabel(new Date('2020-01-16'), 'startDate');
+  const [startDate, setStartDate] = useStateWithLabel(new Date('2021-02-01'), 'startDate');
   const [endDate, setEndDate] = useStateWithLabel(new Date('2021-02-17'), 'endDate');
 
   const [dateRangeIndex, setDateRangeIndex] = useStateWithLabel(0, 'dateRangeIndex');
