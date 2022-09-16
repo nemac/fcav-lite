@@ -91,6 +91,7 @@ export const DateRangePicker = ({
     />
     <div className={classes.root} style={{ marginRight: 16, marginTop: 16 }}>
       <Slider color="secondary"
+        key={`slider-${dateRangeIndex}`}
         defaultValue={dateRangeIndex}
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
