@@ -8,6 +8,7 @@ import { NavigationBar } from './components/NavigationBar';
 import { LeafletMap } from './components/LeafletMap';
 import config from './config';
 import { useStateWithLabel, getWMSLayersYearRange } from './utils';
+import { useEffect } from 'react';
 
 const App = () => {
   const [graphOn, setGraphOn] = useStateWithLabel(false, 'GraphOn');
@@ -24,12 +25,19 @@ const App = () => {
 
   const [productIndex, setProductIndex] = useStateWithLabel(0, 'productIndex');
 
+  const [numLayersLoaded, setNumLayersLoaded] = useStateWithLabel(0, 'numLayersLoaded');
+
   const [wmsLayers, setWmsLayers] = useStateWithLabel(
-    getWMSLayersYearRange(startDate, endDate, productIndex),
+    getWMSLayersYearRange(startDate, endDate, productIndex, setNumLayersLoaded),
     'fullWMSLayers'
   );
 
   const [animating, setAnimating] = useStateWithLabel(false, 'animating');
+
+  // wmsLayers updated
+  useEffect(() => {
+    setNumLayersLoaded(0);
+  }, [wmsLayers]);
 
   return (
       <div>
@@ -44,7 +52,7 @@ const App = () => {
           <LeafletMap graphOn={graphOn} setMap={setMap} startDate={startDate} endDate={endDate}
                       dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex}
                       basemaps={basemaps} basemapIndex={basemapIndex} productIndex={productIndex}
-                      wmsLayers={wmsLayers} animating={animating} />
+                      wmsLayers={wmsLayers} animating={animating} numLayersLoaded={numLayersLoaded} />
       </div>
   );
 };

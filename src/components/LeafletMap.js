@@ -331,7 +331,7 @@ MapController.propTypes = {
 
 export const LeafletMap = ({
   graphOn, setMap, startDate, endDate, dateRangeIndex, setDateRangeIndex,
-  basemaps, basemapIndex, productIndex, wmsLayers, animating
+  basemaps, basemapIndex, productIndex, wmsLayers, animating, numLayersLoaded
 }) => {
   const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0, 0], 'currentGraphCoords');
   const [mapHeight, setMapHeight] = useStateWithLabel('90vh', 'mapHeight');
@@ -414,7 +414,8 @@ export const LeafletMap = ({
                                    setDateRangeIndex={setDateRangeIndex} basemaps={basemaps}
                                    basemapIndex={basemapIndex} productIndex={productIndex}
                                    wmsLayers={wmsLayers} animating={animating} />
-                    <AnimationController layers={wmsLayers} animating={animating} dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex} />
+                    <AnimationController layers={wmsLayers} animating={animating} dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex} 
+                                         numLayersLoaded={numLayersLoaded} />
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}

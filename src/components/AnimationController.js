@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
 
-export const AnimationController = ({ layers, animating, dateRangeIndex, setDateRangeIndex }) => {
+export const AnimationController = ({ layers, animating, dateRangeIndex, setDateRangeIndex, numLayersLoaded }) => {
   const context = useLeafletContext();
 
   // Frame update
@@ -10,6 +10,11 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
     if (!animating) {
       return;
     }
+
+    if (!(numLayersLoaded === layers.length)) {
+      return;
+    }
+
     console.log('Updating frame.');
     if (dateRangeIndex === null) return;
     const layer = layers[dateRangeIndex];
@@ -23,35 +28,28 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
       layer.leafletLayer.setOpacity(0);
     }, 1000);
     return () => { clearTimeout(timer); };
-  }, [animating, dateRangeIndex]);
+  }, [animating, dateRangeIndex, numLayersLoaded]);
 
   // Initial load
   useEffect(() => {
     if (!animating) {
       return;
     }
-    let layersToLoad = 0;
+
+    console.log('Hey there!');
     layers.forEach((layer) => {
       if (!context.map.hasLayer(layer.leafletLayer)) {
         console.log('Adding layer to map with opacity 0...');
         console.log(layer);
         layer.leafletLayer.setOpacity(0);
         context.map.addLayer(layer.leafletLayer);
-        layersToLoad++;
       } else {
         console.log('Layer is already on the map: ');
         console.log(layer);
       }
-      layer.leafletLayer.on('load', () => {
-        console.log('loaded');
-        layersToLoad--;
-        console.log(layersToLoad);
-        if (layersToLoad === 0) {
-          console.log('All layers loaded.');
-          setDateRangeIndex(0);
-        }
-      });
     });
+
+    setDateRangeIndex(0);
   }, [layers, animating]);
 
   return null;
