@@ -7,14 +7,14 @@ import config from '../config';
 import { useStateWithLabel, getWMSLayersYearRange } from '../utils';
 
 export const ProductSelect = ({
-    startDate, endDate, setDateRangeIndex, productIndex, setProductIndex, setWmsLayers
+    startDate, endDate, setDateRangeIndex, productIndex, setProductIndex, setWmsLayers, setNumLayersLoaded
   }) => {
     const productsList = config.productsList;
   
     const onProductChange = (event) => {
       const index = event.target.value;
       setProductIndex(index);
-      const newProduct = getWMSLayersYearRange(startDate, endDate, index);
+      const newProduct = getWMSLayersYearRange(startDate, endDate, index, setNumLayersLoaded);
       setWmsLayers(newProduct);
       setDateRangeIndex(0);
     };

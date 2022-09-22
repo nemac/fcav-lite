@@ -29,8 +29,8 @@ import { useStateWithLabel } from '../utils';
 export const NavigationBar = ({
   graphOn, setGraphOn, map, startDate, setStartDate, endDate, setEndDate,
   dateRangeIndex, setDateRangeIndex, basemaps, basemapIndex, setBasemapIndex,
-  productIndex, setProductIndex, wmsLayers, setWmsLayers, animating, setAnimating
-}) => {
+  productIndex, setProductIndex, wmsLayers, setWmsLayers, animating, setAnimating,
+  setNumLayersLoaded }) => {
   const [darkMode, setDarkMode] = useStateWithLabel(true);
 
   return (
@@ -48,10 +48,12 @@ export const NavigationBar = ({
           <DateRangePicker startDate={startDate} setStartDate={setStartDate} endDate={endDate}
                            setEndDate={setEndDate} dateRangeIndex={dateRangeIndex}
                            setDateRangeIndex={setDateRangeIndex} productIndex={productIndex}
-                           wmsLayers={wmsLayers} setWmsLayers={setWmsLayers} />
+                           wmsLayers={wmsLayers} setWmsLayers={setWmsLayers} 
+                           setNumLayersLoaded={setNumLayersLoaded} />
           <ProductSelect startDate={startDate} endDate={endDate}
                          setDateRangeIndex={setDateRangeIndex} productIndex={productIndex}
-                         setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} />
+                         setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} 
+                         setNumLayersLoaded={setNumLayersLoaded} />
           <ThemeSelect setDarkMode={setDarkMode} />
           <AnimateButton animating={animating} setAnimating={setAnimating} />
           <GraphButton graphOn={graphOn} setGraphOn={setGraphOn} map={map} />

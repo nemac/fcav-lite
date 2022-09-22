@@ -1,9 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
+import { isReturningOnlyNull } from 'eslint-plugin-react/lib/util/jsx';
 
 export const AnimationController = ({ layers, animating, dateRangeIndex, setDateRangeIndex, numLayersLoaded }) => {
   const context = useLeafletContext();
+  const [loaded, setLoaded] = useState(false);
+
+  // Helper function to check if all layers have been loaded
+  const allLayersLoaded = () => {
+    for (const layer of layers) {
+      if (layer.leafletLayer.isLoading()) {
+        layer.leafletLayer.on('load', allLayersLoaded);
+        setLoaded(false);
+        return;
+      }
+    }
+
+    setLoaded(true);
+    return;
+  }
 
   // Frame update
   useEffect(() => {
@@ -11,11 +27,23 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
       return;
     }
 
-    if (!(numLayersLoaded === layers.length)) {
+    console.log('Will I animate?');
+    console.log('Number of layers loaded is ' + numLayersLoaded);
+    console.log('Length is ' + layers.length);
+
+    // if (!(numLayersLoaded === layers.length)) {
+    //   return;
+    // }
+
+    // call again
+    allLayersLoaded();
+
+    if (!loaded) {
       return;
     }
 
     console.log('Updating frame.');
+    document.body.style.cursor='default';
     if (dateRangeIndex === null) return;
     const layer = layers[dateRangeIndex];
     layers.forEach((_layer) => {
@@ -28,11 +56,12 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
       layer.leafletLayer.setOpacity(0);
     }, 1000);
     return () => { clearTimeout(timer); };
-  }, [animating, dateRangeIndex, numLayersLoaded]);
-
+  }, [animating, dateRangeIndex, loaded]);
+  
   // Initial load
   useEffect(() => {
     if (!animating) {
+      setLoaded(false);
       return;
     }
 
@@ -49,6 +78,7 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
       }
     });
 
+    //document.body.style.cursor='wait';
     setDateRangeIndex(0);
   }, [layers, animating]);
 

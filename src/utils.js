@@ -40,7 +40,7 @@ export const getWMSLayersYearRange = (startDate, endDate, productIdx, setNumLaye
       console.log('loaded layer!');
       setNumLayersLoaded(prevNumLayersLoaded => prevNumLayersLoaded + 1);
     });
-    o.leafletLayer.on('unload', () => setNumLayersLoaded(prevNumLayersLoaded => prevNumLayersLoaded - 1));
+    o.leafletLayer.on('unload remove', () => setNumLayersLoaded(prevNumLayersLoaded => prevNumLayersLoaded - 1));
     wmsLayers.push(o);
     tempDate.setDate(tempDate.getDate() + 1);
     tempDate = getNextFWDate(tempDate);

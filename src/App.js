@@ -48,7 +48,7 @@ const App = () => {
                          setBasemapIndex={setBasemapIndex} productIndex={productIndex}
                          setProductIndex={setProductIndex} wmsLayers={wmsLayers}
                          setWmsLayers={setWmsLayers} animating={animating}
-                         setAnimating={setAnimating} />
+                         setAnimating={setAnimating} setNumLayersLoaded={setNumLayersLoaded} />
           <LeafletMap graphOn={graphOn} setMap={setMap} startDate={startDate} endDate={endDate}
                       dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex}
                       basemaps={basemaps} basemapIndex={basemapIndex} productIndex={productIndex}
