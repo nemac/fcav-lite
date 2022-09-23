@@ -10,15 +10,14 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
   // Helper function to check if all layers have been loaded
   const allLayersLoaded = () => {
     for (const layer of layers) {
-      if (layer.leafletLayer.isLoading()) {
-        layer.leafletLayer.on('load', allLayersLoaded);
+      if (layer.leafletLayer.isLoading() || !context.map.hasLayer(layer.leafletLayer)) {
         setLoaded(false);
-        return;
+        return false;
       }
     }
 
     setLoaded(true);
-    return;
+    return true;
   }
 
   // Frame update
@@ -27,24 +26,22 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
       return;
     }
 
-    console.log('Will I animate?');
-    console.log('Number of layers loaded is ' + numLayersLoaded);
-    console.log('Length is ' + layers.length);
-
     // if (!(numLayersLoaded === layers.length)) {
     //   return;
     // }
 
     // call again
-    allLayersLoaded();
+    const layersLoaded = allLayersLoaded();
 
-    if (!loaded) {
+    console.log('Will I animate?');
+    console.log(layersLoaded ? "All layers loaded" : "Not loaded.");
+    console.log(layers[0]);
+
+    if (!layersLoaded) {
       return;
     }
 
     console.log('Updating frame.');
-    document.body.style.cursor='default';
-    if (dateRangeIndex === null) return;
     const layer = layers[dateRangeIndex];
     layers.forEach((_layer) => {
       _layer.leafletLayer.bringToBack();
@@ -67,6 +64,7 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
 
     console.log('Hey there!');
     layers.forEach((layer) => {
+      layer.leafletLayer.on('load', allLayersLoaded);
       if (!context.map.hasLayer(layer.leafletLayer)) {
         console.log('Adding layer to map with opacity 0...');
         console.log(layer);
@@ -76,11 +74,11 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
         console.log('Layer is already on the map: ');
         console.log(layer);
       }
-    });
 
     //document.body.style.cursor='wait';
-    setDateRangeIndex(0);
+    //setDateRangeIndex(0);
   }, [layers, animating]);
+});
 
   return null;
 };

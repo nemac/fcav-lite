@@ -16,7 +16,7 @@ export const ProductSelect = ({
       setProductIndex(index);
       const newProduct = getWMSLayersYearRange(startDate, endDate, index, setNumLayersLoaded);
       setWmsLayers(newProduct);
-      setDateRangeIndex(0);
+      //setDateRangeIndex(0);
     };
   
     return (
