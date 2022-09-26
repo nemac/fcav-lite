@@ -26,7 +26,7 @@ const center = [37, -98];
 const zoom = 4.5;
 
 const MapController = ({
-  graphOn, currentGraphCoords, setMap, modisData, setModisData, modisDataConfig,
+  graphOn, currentGraphCoords, activeLayerOpacity, setMap, modisData, setModisData, modisDataConfig,
   setModisDataConfig, startDate, endDate, dateRangeIndex, basemaps,
   basemapIndex, productIndex, wmsLayers, animating
 }) => {
@@ -209,7 +209,7 @@ const MapController = ({
       //
       map.addLayer(leafletLayer);
       leafletLayer.bringToBack();
-      leafletLayer.setOpacity(1);
+      leafletLayer.setOpacity(activeLayerOpacity);
       basemapRef.current = leafletLayer;
     }
     if (hasBaseMapChanged && !isInitialRender) {
@@ -246,7 +246,7 @@ const MapController = ({
         map.addLayer(layer.leafletLayer);
       }
       layer.leafletLayer.bringToFront();
-      layer.leafletLayer.setOpacity(1);
+      layer.leafletLayer.setOpacity(activeLayerOpacity);
       if (graphOn) {
         // chartLineValue();
         const newLineValue = { ...modisDataConfig };
@@ -284,6 +284,15 @@ const MapController = ({
       }
     }
   }, [hasGraphCoordsChanged, currentGraphCoords]);
+  // hook: active layer opacity changed
+  useEffect(() => {
+    for (const layer of wmsLayers) {
+      if (layer.leafletLayer.opacity !== 0) {
+        layer.leafletLayer.setOpacity(activeLayerOpacity);
+      }
+    }
+  }, [activeLayerOpacity]);
+
   if (isInitialRender) { // check if initilization is complete so we don't reinitilize components
     search.addTo(map);
     const legend = L.control({ position: 'bottomright' });
@@ -334,6 +343,7 @@ export const LeafletMap = ({
 }) => {
   const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0, 0], 'currentGraphCoords');
   const [mapHeight, setMapHeight] = useStateWithLabel('90vh', 'mapHeight');
+  const [activeLayerOpacity, setActiveLayerOpacity] = useStateWithLabel(1, 'activeLayerOpacity');
 
   const [modisData, setModisData] = useStateWithLabel({
     labels: ['1', '2', '3', '4', '5', '6'],
@@ -405,16 +415,17 @@ export const LeafletMap = ({
                       display: 'flex'
                     }}
                 >
-                    <MapController graphOn={graphOn} currentGraphCoords={currentGraphCoords}
-                                   setMap={setMap} modisData={modisData}
+                    <MapController graphOn={graphOn} currentGraphCoords={currentGraphCoords} 
+                                   activeLayerOpacity={activeLayerOpacity} setMap={setMap} modisData={modisData}
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
                                    setModisDataConfig={setModisDataConfig} startDate={startDate}
                                    endDate={endDate} dateRangeIndex={dateRangeIndex}
                                    setDateRangeIndex={setDateRangeIndex} basemaps={basemaps}
                                    basemapIndex={basemapIndex} productIndex={productIndex}
                                    wmsLayers={wmsLayers} animating={animating} />
-                    <AnimationController layers={wmsLayers} animating={animating} dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex} 
-                                         animationTime={animationTime} />
+                    <AnimationController layers={wmsLayers} animating={animating} dateRangeIndex={dateRangeIndex} 
+                                         setDateRangeIndex={setDateRangeIndex} animationTime={animationTime}
+                                         activeLayerOpacity={activeLayerOpacity} setActiveLayerOpacity={setActiveLayerOpacity} />
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}

@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
 import { isReturningOnlyNull } from 'eslint-plugin-react/lib/util/jsx';
+import 'leaflet-spin';
 
 export const AnimationController = ({ 
-  layers, animating, dateRangeIndex, setDateRangeIndex, animationTime 
+  layers, animating, dateRangeIndex, setDateRangeIndex, animationTime, activeLayerOpacity, setActiveLayerOpacity 
 }) => {
   const timeMultiplicationFactor = 1000; // number of milliseconds per second of animation time
   const context = useLeafletContext();
   const [loaded, setLoaded] = useState(false);
+  const layerOpacityWhenLoading = 0.3;
 
   // Helper function to check if all layers have been loaded
   const allLayersLoaded = () => {
@@ -37,8 +39,13 @@ export const AnimationController = ({
     console.log(layers[0]);
 
     if (!layersLoaded) {
+      setActiveLayerOpacity(layerOpacityWhenLoading);
+      context.map.spin(true, { color: 'white' });
       return;
     }
+
+    setActiveLayerOpacity(1);
+    context.map.spin(false);
 
     console.log('Updating frame.');
     const layer = layers[dateRangeIndex];
@@ -46,7 +53,7 @@ export const AnimationController = ({
       _layer.leafletLayer.bringToBack();
     });
     layer.leafletLayer.bringToFront();
-    layer.leafletLayer.setOpacity(1);
+    layer.leafletLayer.setOpacity(activeLayerOpacity);
     const timer = setTimeout(() => {
       setDateRangeIndex(prevDateRangeIndex => (prevDateRangeIndex + 1) === layers.length ? 0 : prevDateRangeIndex + 1);
       layer.leafletLayer.setOpacity(0);
@@ -58,6 +65,8 @@ export const AnimationController = ({
   useEffect(() => {
     if (!animating) {
       setLoaded(false);
+      setActiveLayerOpacity(1);
+      context.map.spin(false);
       return;
     }
 
