@@ -27,7 +27,7 @@ const zoom = 4.5;
 
 const MapController = ({
   graphOn, currentGraphCoords, setMap, modisData, setModisData, modisDataConfig,
-  setModisDataConfig, startDate, endDate, dateRangeIndex, setDateRangeIndex, basemaps,
+  setModisDataConfig, startDate, endDate, dateRangeIndex, basemaps,
   basemapIndex, productIndex, wmsLayers, animating
 }) => {
   const search = geosearch();
@@ -321,7 +321,6 @@ MapController.propTypes = {
   startDate: PropTypes.instanceOf(Date).isRequired,
   endDate: PropTypes.instanceOf(Date).isRequired,
   dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.func.isRequired,
   basemaps: PropTypes.array.isRequired,
   basemapIndex: PropTypes.number.isRequired,
   productIndex: PropTypes.number.isRequired,
@@ -331,7 +330,7 @@ MapController.propTypes = {
 
 export const LeafletMap = ({
   graphOn, setMap, startDate, endDate, dateRangeIndex, setDateRangeIndex,
-  basemaps, basemapIndex, productIndex, wmsLayers, animating, numLayersLoaded
+  basemaps, basemapIndex, productIndex, wmsLayers, animating, animationTime
 }) => {
   const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0, 0], 'currentGraphCoords');
   const [mapHeight, setMapHeight] = useStateWithLabel('90vh', 'mapHeight');
@@ -415,7 +414,7 @@ export const LeafletMap = ({
                                    basemapIndex={basemapIndex} productIndex={productIndex}
                                    wmsLayers={wmsLayers} animating={animating} />
                     <AnimationController layers={wmsLayers} animating={animating} dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex} 
-                                         numLayersLoaded={numLayersLoaded} />
+                                         animationTime={animationTime} />
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}
@@ -435,5 +434,6 @@ LeafletMap.propTypes = {
   basemapIndex: PropTypes.number.isRequired,
   productIndex: PropTypes.number.isRequired,
   wmsLayers: PropTypes.array.isRequired,
-  animating: PropTypes.bool.isRequired
+  animating: PropTypes.bool.isRequired,
+  animationTime: PropTypes.number.isRequired
 };

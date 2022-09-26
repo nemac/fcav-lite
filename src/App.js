@@ -25,19 +25,14 @@ const App = () => {
 
   const [productIndex, setProductIndex] = useStateWithLabel(0, 'productIndex');
 
-  const [numLayersLoaded, setNumLayersLoaded] = useStateWithLabel(0, 'numLayersLoaded');
-
   const [wmsLayers, setWmsLayers] = useStateWithLabel(
-    getWMSLayersYearRange(startDate, endDate, productIndex, setNumLayersLoaded),
+    getWMSLayersYearRange(startDate, endDate, productIndex),
     'fullWMSLayers'
   );
 
   const [animating, setAnimating] = useStateWithLabel(false, 'animating');
 
-  // wmsLayers updated
-  useEffect(() => {
-    setNumLayersLoaded(0);
-  }, [wmsLayers]);
+  const [animationTime, setAnimationTime] = useStateWithLabel(1, 'animationTime');
 
   return (
       <div>
@@ -48,11 +43,13 @@ const App = () => {
                          setBasemapIndex={setBasemapIndex} productIndex={productIndex}
                          setProductIndex={setProductIndex} wmsLayers={wmsLayers}
                          setWmsLayers={setWmsLayers} animating={animating}
-                         setAnimating={setAnimating} setNumLayersLoaded={setNumLayersLoaded} />
+                         setAnimating={setAnimating} animationTime={animationTime}
+                         setAnimationTime={setAnimationTime} />
           <LeafletMap graphOn={graphOn} setMap={setMap} startDate={startDate} endDate={endDate}
                       dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex}
                       basemaps={basemaps} basemapIndex={basemapIndex} productIndex={productIndex}
-                      wmsLayers={wmsLayers} animating={animating} numLayersLoaded={numLayersLoaded} />
+                      wmsLayers={wmsLayers} animating={animating} animationTime={animationTime}
+                      />
       </div>
   );
 };

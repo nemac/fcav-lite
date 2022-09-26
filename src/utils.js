@@ -26,7 +26,7 @@ const usePrevious = (value) => {
   return ref.current;
 };
 
-export const getWMSLayersYearRange = (startDate, endDate, productIdx, setNumLayersLoaded) => {
+export const getWMSLayersYearRange = (startDate, endDate, productIdx) => {
   const wmsLayers = [];
   let tempDate = getNextFWDate(startDate);
   //    console.log("tempdate: " + tempDate);
@@ -36,11 +36,6 @@ export const getWMSLayersYearRange = (startDate, endDate, productIdx, setNumLaye
     const o = config.wms_template(wmsdate, productIdx);
     o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options);
     o.date = tempDate;
-    o.leafletLayer.on('load', () => {
-      console.log('loaded layer!');
-      setNumLayersLoaded(prevNumLayersLoaded => prevNumLayersLoaded + 1);
-    });
-    o.leafletLayer.on('unload remove', () => setNumLayersLoaded(prevNumLayersLoaded => prevNumLayersLoaded - 1));
     wmsLayers.push(o);
     tempDate.setDate(tempDate.getDate() + 1);
     tempDate = getNextFWDate(tempDate);

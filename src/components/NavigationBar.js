@@ -25,12 +25,13 @@ import { GraphButton } from './GraphButton';
 import nemacLogoWhite from '../nemac_logo_white.png';
 import nemacLogoBlack from '../nemac_logo_black.png';
 import { useStateWithLabel } from '../utils';
+import { AnimationTimeSelect } from './AnimationTimeSelect';
 
 export const NavigationBar = ({
   graphOn, setGraphOn, map, startDate, setStartDate, endDate, setEndDate,
   dateRangeIndex, setDateRangeIndex, basemaps, basemapIndex, setBasemapIndex,
-  productIndex, setProductIndex, wmsLayers, setWmsLayers, animating, setAnimating,
-  setNumLayersLoaded }) => {
+  productIndex, setProductIndex, wmsLayers, setWmsLayers, animating, setAnimating, animationTime, setAnimationTime 
+}) => {
   const [darkMode, setDarkMode] = useStateWithLabel(true);
 
   return (
@@ -48,14 +49,13 @@ export const NavigationBar = ({
           <DateRangePicker startDate={startDate} setStartDate={setStartDate} endDate={endDate}
                            setEndDate={setEndDate} dateRangeIndex={dateRangeIndex}
                            setDateRangeIndex={setDateRangeIndex} productIndex={productIndex}
-                           wmsLayers={wmsLayers} setWmsLayers={setWmsLayers} 
-                           setNumLayersLoaded={setNumLayersLoaded} />
+                           wmsLayers={wmsLayers} setWmsLayers={setWmsLayers} />
           <ProductSelect startDate={startDate} endDate={endDate}
                          setDateRangeIndex={setDateRangeIndex} productIndex={productIndex}
-                         setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} 
-                         setNumLayersLoaded={setNumLayersLoaded} />
+                         setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} />
           <ThemeSelect setDarkMode={setDarkMode} />
           <AnimateButton animating={animating} setAnimating={setAnimating} />
+          <AnimationTimeSelect animationTime={animationTime} setAnimationTime={setAnimationTime} />
           <GraphButton graphOn={graphOn} setGraphOn={setGraphOn} map={map} />
         </Toolbar>
       </AppBar>
@@ -82,5 +82,7 @@ NavigationBar.propTypes = {
   wmsLayers: PropTypes.array.isRequired,
   setWmsLayers: PropTypes.func.isRequired,
   animating: PropTypes.bool.isRequired,
-  setAnimating: PropTypes.func.isRequired
+  setAnimating: PropTypes.func.isRequired,
+  animationTime: PropTypes.number.isRequired,
+  setAnimationTime: PropTypes.func.isRequired
 };

@@ -15,7 +15,7 @@ import { useStateWithLabel, useCompare, getWMSLayersYearRange } from '../utils';
 
 export const DateRangePicker = ({
   startDate, setStartDate, endDate, setEndDate, dateRangeIndex,
-  setDateRangeIndex, productIndex, wmsLayers, setWmsLayers, setNumLayersLoaded
+  setDateRangeIndex, productIndex, wmsLayers, setWmsLayers
 }) => {
   const useStyles = makeStyles({
     root: {
@@ -42,7 +42,7 @@ export const DateRangePicker = ({
     }
 
     setStartDate(date);
-    const newLayerRange = getWMSLayersYearRange(date, endDate, productIndex, setNumLayersLoaded);
+    const newLayerRange = getWMSLayersYearRange(date, endDate, productIndex);
     setWmsLayers(newLayerRange);
     setDateRangeIndex(0);
     // getChartData(modisData.coordinates[0], modisData.coordinates[1]);
@@ -68,7 +68,7 @@ export const DateRangePicker = ({
     }
 
     setEndDate(date); // set end date state
-    const newLayerRange = getWMSLayersYearRange(startDate, date, productIndex, setNumLayersLoaded);
+    const newLayerRange = getWMSLayersYearRange(startDate, date, productIndex);
     setWmsLayers(newLayerRange);
     setDateRangeIndex(0);
   };

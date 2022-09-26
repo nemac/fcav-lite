@@ -3,7 +3,10 @@ import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
 import { isReturningOnlyNull } from 'eslint-plugin-react/lib/util/jsx';
 
-export const AnimationController = ({ layers, animating, dateRangeIndex, setDateRangeIndex, numLayersLoaded }) => {
+export const AnimationController = ({ 
+  layers, animating, dateRangeIndex, setDateRangeIndex, animationTime 
+}) => {
+  const timeMultiplicationFactor = 1000; // number of milliseconds per second of animation time
   const context = useLeafletContext();
   const [loaded, setLoaded] = useState(false);
 
@@ -26,10 +29,6 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
       return;
     }
 
-    // if (!(numLayersLoaded === layers.length)) {
-    //   return;
-    // }
-
     // call again
     const layersLoaded = allLayersLoaded();
 
@@ -51,7 +50,7 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
     const timer = setTimeout(() => {
       setDateRangeIndex(prevDateRangeIndex => (prevDateRangeIndex + 1) === layers.length ? 0 : prevDateRangeIndex + 1);
       layer.leafletLayer.setOpacity(0);
-    }, 1000);
+    }, animationTime * timeMultiplicationFactor);
     return () => { clearTimeout(timer); };
   }, [animating, dateRangeIndex, loaded]);
   
@@ -85,5 +84,8 @@ export const AnimationController = ({ layers, animating, dateRangeIndex, setDate
 
 AnimationController.propTypes = {
   layers: PropTypes.array.isRequired,
-  animating: PropTypes.bool.isRequired
+  animating: PropTypes.bool.isRequired,
+  dateRangeIndex: PropTypes.number.isRequired,
+  setDateRangeIndex: PropTypes.func.isRequired,
+  animationTime: PropTypes.number.isRequired
 };
