@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
-import { isReturningOnlyNull } from 'eslint-plugin-react/lib/util/jsx';
+import 'leaflet-spin';
+import { ContactlessTwoTone } from '@material-ui/icons';
 
 export const AnimationController = ({ 
   layers, animating, dateRangeIndex, setDateRangeIndex, animationTime 
@@ -37,9 +38,11 @@ export const AnimationController = ({
     console.log(layers[0]);
 
     if (!layersLoaded) {
+      context.map.spin(true);
       return;
     }
 
+    context.map.spin(false);
     console.log('Updating frame.');
     const layer = layers[dateRangeIndex];
     layers.forEach((_layer) => {
@@ -58,6 +61,7 @@ export const AnimationController = ({
   useEffect(() => {
     if (!animating) {
       setLoaded(false);
+      context.map.spin(false);
       return;
     }
 

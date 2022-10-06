@@ -5,7 +5,7 @@ LeafletMap
 */
 import React from 'react';
 import { NavigationBar } from './components/NavigationBar';
-import { LeafletMap } from './components/LeafletMap';
+import { LeafletMap } from './components/LeafletMap/LeafletMap';
 import config from './config';
 import { useStateWithLabel, getWMSLayersYearRange } from './utils';
 import { useEffect } from 'react';

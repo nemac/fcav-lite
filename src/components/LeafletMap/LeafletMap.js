@@ -10,16 +10,22 @@ import { Grid } from '@material-ui/core';
 import { MapContainer, useMap } from 'react-leaflet';
 import 'leaflet-loading';
 import 'leaflet-loading/src/Control.Loading.css';
-import { geosearch } from 'esri-leaflet-geocoder';
+//import { geosearch } from 'esri-leaflet-geocoder';
+// suggested here: https://stackoverflow.com/questions/66519812/esri-leaflet-geocoder-component-not-rendering-how-to-connect-providers-in-prod
+import * as ELG  from 'esri-leaflet-geocoder';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
 import { parse } from 'fast-xml-parser';
-import forwarn2Legend from '../forwarn2-legend.png';
-import config from '../config';
-import { getNextFWDate, toWMSDate } from '../datemanagement';
-import { NDVIMultiYearGraph } from './NDVIMultiYearGraph';
-import { AnimationController } from './AnimationController';
-import { useStateWithLabel, useCompare } from '../utils';
+import forwarn2Legend from '../../forwarn2-legend.png';
+import config from '../../config';
+import { getNextFWDate, toWMSDate } from '../../datemanagement';
+import { NDVIMultiYearGraph } from '../NDVIMultiYearGraph';
+import { AnimationController } from '../AnimationController';
+import { useStateWithLabel, useCompare } from '../../utils';
+import './LeafletMap.css';
+
+// This API Key is used to access ArcGIS Online location services
+const apiKey = 'AAPK193b1a907b48469f98a0d22c7e27c57d_8CPajLDlUjQfkzjt4nWhAM0cjYe_8sRYBBnG0_iVP74XPYKqbQU3uhduKsl_pBs';
 
 // Map Defaults
 const center = [37, -98];
@@ -30,7 +36,14 @@ const MapController = ({
   setModisDataConfig, startDate, endDate, dateRangeIndex, basemaps,
   basemapIndex, productIndex, wmsLayers, animating
 }) => {
-  const search = geosearch();
+  const search = ELG.geosearch({
+    useMapBounds: false,
+    providers: [
+      ELG.arcgisOnlineProvider({
+        apikey: apiKey
+      })
+    ]
+  });
 
   const map = useMap();
 
@@ -235,7 +248,7 @@ const MapController = ({
       return;
     }
     
-    if (hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged) {
+    if (hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged || hasStartDateChanged || hasEndDateChanged) {
       //        console.log("date range index hook");
       clearMap();
       const layer = wmsLayers[dateRangeIndex];
@@ -256,7 +269,7 @@ const MapController = ({
         setModisDataConfig(newLineValue);
       }
     }
-  }, [hasDateRangeIndexChanged, dateRangeIndex, productIndex]);
+  }, [hasDateRangeIndexChanged, hasStartDateChanged, hasEndDateChanged, dateRangeIndex, productIndex, startDate, endDate]);
 
   // Hook: Animation button clicked - add all layers to the map
   // useEffect(() => {
