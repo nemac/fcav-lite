@@ -10,15 +10,12 @@ import { Grid } from '@material-ui/core';
 import { MapContainer, useMap } from 'react-leaflet';
 import 'leaflet-loading';
 import 'leaflet-loading/src/Control.Loading.css';
-//import { geosearch } from 'esri-leaflet-geocoder';
 // suggested here: https://stackoverflow.com/questions/66519812/esri-leaflet-geocoder-component-not-rendering-how-to-connect-providers-in-prod
 import * as ELG  from 'esri-leaflet-geocoder';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
 import { parse } from 'fast-xml-parser';
 import forwarn2Legend from '../../forwarn2-legend.png';
-import config from '../../config';
-import { getNextFWDate, toWMSDate } from '../../datemanagement';
 import { NDVIMultiYearGraph } from '../NDVIMultiYearGraph';
 import { AnimationController } from '../AnimationController';
 import { useStateWithLabel, useCompare } from '../../utils';
