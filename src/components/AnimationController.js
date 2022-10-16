@@ -2,11 +2,16 @@ import { useState, useEffect } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
 import 'leaflet-spin';
-import { ContactlessTwoTone } from '@material-ui/icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectLayerProperty, changeDateRangeIndex, incrementDateRangeIndex } from '../reducers/layersSlice';
 
 export const AnimationController = ({ 
-  layers, animating, dateRangeIndex, setDateRangeIndex, animationTime 
+  animating, animationTime 
 }) => {
+  const dispatch = useDispatch();
+  const layers = useSelector(state => selectLayerProperty(state, 'wmsLayers'));
+  const dateRangeIndex = useSelector(state => selectLayerProperty(state, 'dateRangeIndex'));
+  
   const timeMultiplicationFactor = 1000; // number of milliseconds per second of animation time
   const context = useLeafletContext();
   const [loaded, setLoaded] = useState(false);
@@ -51,7 +56,11 @@ export const AnimationController = ({
     layer.leafletLayer.bringToFront();
     layer.leafletLayer.setOpacity(1);
     const timer = setTimeout(() => {
-      setDateRangeIndex(prevDateRangeIndex => (prevDateRangeIndex + 1) === layers.length ? 0 : prevDateRangeIndex + 1);
+      if (dateRangeIndex === layers.length - 1) {
+        dispatch(changeDateRangeIndex(0));
+      } else {
+        dispatch(incrementDateRangeIndex());
+      }
       layer.leafletLayer.setOpacity(0);
     }, animationTime * timeMultiplicationFactor);
     return () => { clearTimeout(timer); };
@@ -87,9 +96,6 @@ export const AnimationController = ({
 };
 
 AnimationController.propTypes = {
-  layers: PropTypes.array.isRequired,
   animating: PropTypes.bool.isRequired,
-  dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.func.isRequired,
   animationTime: PropTypes.number.isRequired
 };

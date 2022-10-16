@@ -8,10 +8,14 @@ const graphSlice = createSlice({
     name: 'graph',
     initialState,
     reducers: {
-        setGraphOn(state, action) {
-            state.graphOn = action.payload;
+        toggleGraphOn(state) {
+            state.graphOn = !state.graphOn;
         }
     }
 });
+
+export const selectGraphOn = state => state.graph.graphOn;
+
+export const { toggleGraphOn } = graphSlice.actions;
 
 export default graphSlice.reducer;

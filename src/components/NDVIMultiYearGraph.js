@@ -9,8 +9,12 @@ import Typography from '@material-ui/core/Typography';
 import { Line } from 'react-chartjs-2';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+import { selectGraphOn } from '../reducers/graphSlice';
 
-export const NDVIMultiYearGraph = ({ graphOn, modisData, modisDataConfig }) => {
+export const NDVIMultiYearGraph = ({ modisData, modisDataConfig }) => {
+  const graphOn = useSelector(selectGraphOn);
+
   const useStyles = makeStyles({
     paper: {
       position: 'absolute',
@@ -57,7 +61,6 @@ export const NDVIMultiYearGraph = ({ graphOn, modisData, modisDataConfig }) => {
 };
 
 NDVIMultiYearGraph.propTypes = {
-  graphOn: PropTypes.bool.isRequired,
   modisData: PropTypes.object.isRequired,
   modisDataConfig: PropTypes.object.isRequired
 };

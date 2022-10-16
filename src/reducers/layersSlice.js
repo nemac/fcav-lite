@@ -1,39 +1,54 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { getWMSLayersYearRange } from "../utils";
 
+const startDate = '2021-01-02';
+const endDate = '2021-02-17';
+
 const initialState = {
-    wmsLayers: [],
-    startDate: new Date().toISOString(),
-    endDate: new Date().toISOString(),
+    wmsLayers: getWMSLayersYearRange(new Date(startDate), new Date(endDate), 0),
+    startDate,
+    endDate,
     dateRangeIndex: 0,
     productIndex: 0
 };
 
-const updateWmsLayers = state => state.wmsLayers = getWMSLayersYearRange(state.startDate, state.endDate, state.productIndex);
+const updateWmsLayers = state => 
+    state.wmsLayers = getWMSLayersYearRange(new Date(state.startDate), new Date(state.endDate), state.productIndex);
 
 const layersSlice = createSlice({
     name: 'layers',
     initialState,
     reducers: {
-        startDateChanged(state, action) {
+        changeStartDate(state, action) {
             state.startDate = action.payload;
             updateWmsLayers(state);
         },
-        endDateChanged(state, action) {
+        changeEndDate(state, action) {
             state.endDate = action.payload;
             updateWmsLayers(state);
         },
-        dateRangeIndexChanged(state, action) {
+        changeDateRangeIndex(state, action) {
             state.dateRangeIndex = action.payload;
         },
-        productIndexChanged(state, action) {
+        incrementDateRangeIndex(state) {
+            if (state.dateRangeIndex < state.wmsLayers.length - 1) {
+                state.dateRangeIndex++;
+            }
+        },
+        changeProductIndex(state, action) {
             state.productIndex = action.payload;
             updateWmsLayers(state);
         }
     }
 });
 
-export const selectWmsLayers = state => state.layers.wmsLayers;
-export const selectDateRangeIndex = state => state.layers.dateRangeIndex;
+export const selectLayerProperty = (state, property) => state.layers[property];
+
+export const { 
+    changeStartDate, 
+    changeEndDate, 
+    changeDateRangeIndex,
+    incrementDateRangeIndex, 
+    changeProductIndex } = layersSlice.actions;
 
 export default layersSlice.reducer;

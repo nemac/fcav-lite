@@ -5,7 +5,7 @@ import React, {
 import PropTypes from 'prop-types';
 import config from '../config';
 import { CustomThemeContext } from '../CustomThemeProvider';
-import { useStateWithLabel, getWMSLayersYearRange } from '../utils';
+import { useStateWithLabel } from '../utils';
 
 export const ThemeSelect = ({ setDarkMode }) => {
     // theme switching

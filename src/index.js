@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import 'leaflet/dist/leaflet.css';
 import App from './App';
 // import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { Provider } from 'react-redux';
+import store from './store';
 import CustomThemeProvider from './CustomThemeProvider';
 
 /* export const theme = createMuiTheme({
@@ -23,8 +25,10 @@ import CustomThemeProvider from './CustomThemeProvider';
 }); */
 const rootElement = document.getElementById('app');
 ReactDOM.render(
-  <CustomThemeProvider>
-    <App/>,
-    </CustomThemeProvider>,
+  <Provider store={store}>
+    <CustomThemeProvider>
+      <App/>
+    </CustomThemeProvider>
+  </Provider>,
   rootElement
 );

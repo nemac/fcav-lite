@@ -12,14 +12,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import PropTypes from 'prop-types';
-import L from 'leaflet';
-import config from '../config';
-import { CustomThemeContext } from '../CustomThemeProvider';
-import { getNextFWDate, toWMSDate } from '../datemanagement';
-import { useStateWithLabel, getWMSLayersYearRange } from '../utils';
 
 export const DropDownSelector = ({
-  buttonText, labelId, id, value, onChange, options, getOptionName}) => {
+  buttonText, labelId, id, value, onChange, options, getOptionName
+}) => {
   
     return (
     <FormControl letiant="outlined" style={{ marginRight: 16 }}>

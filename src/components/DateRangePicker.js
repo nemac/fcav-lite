@@ -12,11 +12,21 @@ import { makeStyles } from '@material-ui/core/styles';
 import { getNextFWDate, toWMSDate } from '../datemanagement';
 import config from '../config';
 import { useStateWithLabel, useCompare, getWMSLayersYearRange } from '../utils';
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  changeStartDate,
+  changeEndDate,
+  changeDateRangeIndex,
+  selectLayerProperty
+} from '../reducers/layersSlice';
 
-export const DateRangePicker = ({
-  startDate, setStartDate, endDate, setEndDate, dateRangeIndex,
-  setDateRangeIndex, productIndex, wmsLayers, setWmsLayers
-}) => {
+export const DateRangePicker = () => {
+  const dispatch = useDispatch();
+  const startDate = useSelector(state => selectLayerProperty(state, 'startDate'));
+  const endDate = useSelector(state => selectLayerProperty(state, 'endDate'));
+  const dateRangeIndex = useSelector(state => selectLayerProperty(state, 'dateRangeIndex'));
+  const wmsLayers = useSelector(state => selectLayerProperty(state, 'wmsLayers'));
+
   const useStyles = makeStyles({
     root: {
       width: 300
@@ -24,12 +34,6 @@ export const DateRangePicker = ({
   });
 
   const classes = useStyles();
-
-  // Date State
-  const [currentDate, setCurrentDate] = useStateWithLabel(new Date('2020-01-16'), 'currentDate');
-  const hasDateRangeIndexChanged = useCompare(dateRangeIndex);
-  const hasStartDateChanged = useCompare(startDate);
-  const hasEndDateChanged = useCompare(endDate);
 
   const onStartDateChange = (date) => {
     let day = date.getDate().toString();
@@ -41,10 +45,8 @@ export const DateRangePicker = ({
       month = `0${month}`;
     }
 
-    setStartDate(date);
-    const newLayerRange = getWMSLayersYearRange(date, endDate, productIndex);
-    setWmsLayers(newLayerRange);
-    setDateRangeIndex(0);
+    dispatch(changeStartDate(date.toISOString()));
+    dispatch(changeDateRangeIndex(0));
     // getChartData(modisData.coordinates[0], modisData.coordinates[1]);
   };
 
@@ -52,8 +54,7 @@ export const DateRangePicker = ({
     //    console.log('slider change')
     //    console.log('slider value is ' + String(v))
     if (v !== dateRangeIndex) {
-      setDateRangeIndex(v);
-      setCurrentDate(wmsLayers[v].date);
+      dispatch(changeDateRangeIndex(v));
     }
   };
 
@@ -67,10 +68,8 @@ export const DateRangePicker = ({
       month = `0${month}`;
     }
 
-    setEndDate(date); // set end date state
-    const newLayerRange = getWMSLayersYearRange(startDate, date, productIndex);
-    setWmsLayers(newLayerRange);
-    setDateRangeIndex(0);
+    dispatch(changeEndDate(date.toISOString())); // set end date state
+    dispatch(changeDateRangeIndex(0));
   };
 
   return (
@@ -118,16 +117,4 @@ export const DateRangePicker = ({
     />
     </MuiPickersUtilsProvider>
   );
-};
-
-DateRangePicker.propTypes = {
-  startDate: PropTypes.instanceOf(Date).isRequired,
-  setStartDate: PropTypes.func.isRequired,
-  endDate: PropTypes.instanceOf(Date).isRequired,
-  setEndDate: PropTypes.func.isRequired,
-  dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.func.isRequired,
-  productIndex: PropTypes.number.isRequired,
-  wmsLayers: PropTypes.array.isRequired,
-  setWmsLayers: PropTypes.func.isRequired
 };

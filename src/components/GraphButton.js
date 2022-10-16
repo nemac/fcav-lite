@@ -5,13 +5,15 @@ import React, { useDebugValue, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectGraphOn, toggleGraphOn } from '../reducers/graphSlice';
 
-export const GraphButton = ({ graphOn, setGraphOn, map }) => {
+export const GraphButton = ({ map }) => {
+  const dispatch = useDispatch();
+  const graphOn = useSelector(selectGraphOn);
+
   const handleGraphOpen = () => {
-    // setModisData(getChartData(-78.65678578328217,35.45115625827913));
-    // console.log(fetchChartData(-78.65678578328217,35.45115625827913));
-    setGraphOn(!graphOn);
-    // if(graphOn){
+    dispatch(toggleGraphOn());
     const mapContainer = document.querySelector('.mapContainer');
     if (!graphOn) {
       mapContainer.style.setProperty('height', '45vh');
@@ -19,11 +21,8 @@ export const GraphButton = ({ graphOn, setGraphOn, map }) => {
       mapContainer.style.setProperty('height', '90vh');
     }
     map.invalidateSize();
-    // }
   };
 
-  // const handleGraphClose = () => setGraphOn(false);
-  // getChartData(-78.65678578328217,35.45115625827913)
   return (
         <Button
             letiant="contained"
@@ -36,7 +35,5 @@ export const GraphButton = ({ graphOn, setGraphOn, map }) => {
 };
 
 GraphButton.propTypes = {
-  graphOn: PropTypes.bool.isRequired,
-  setGraphOn: PropTypes.func.isRequired,
   map: PropTypes.instanceOf(L.Map).isRequired
 };

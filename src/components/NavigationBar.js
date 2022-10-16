@@ -19,7 +19,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { BasemapSelect } from './BasemapSelect';
 import { ThemeSelect } from './ThemeSelect';
 import { ProductSelect } from './ProductSelect';
-import { DateRangePicker } from './Datepicker';
+import { DateRangePicker } from './DateRangePicker';
 import { AnimateButton } from './AnimateButton';
 import { GraphButton } from './GraphButton';
 import nemacLogoWhite from '../nemac_logo_white.png';
@@ -28,9 +28,7 @@ import { useStateWithLabel } from '../utils';
 import { AnimationTimeSelect } from './AnimationTimeSelect';
 
 export const NavigationBar = ({
-  graphOn, setGraphOn, map, startDate, setStartDate, endDate, setEndDate,
-  dateRangeIndex, setDateRangeIndex, basemaps, basemapIndex, setBasemapIndex,
-  productIndex, setProductIndex, wmsLayers, setWmsLayers, animating, setAnimating, animationTime, setAnimationTime 
+  map, animating, setAnimating, animationTime, setAnimationTime 
 }) => {
   const [darkMode, setDarkMode] = useStateWithLabel(true);
 
@@ -44,19 +42,13 @@ export const NavigationBar = ({
       >
         <Toolbar>
           <img src={ darkMode ? nemacLogoWhite : nemacLogoBlack} width="150" alt="your mom"></img>
-          <BasemapSelect basemaps={basemaps} basemapIndex={basemapIndex}
-                           setBasemapIndex={setBasemapIndex} />
-          <DateRangePicker startDate={startDate} setStartDate={setStartDate} endDate={endDate}
-                           setEndDate={setEndDate} dateRangeIndex={dateRangeIndex}
-                           setDateRangeIndex={setDateRangeIndex} productIndex={productIndex}
-                           wmsLayers={wmsLayers} setWmsLayers={setWmsLayers} />
-          <ProductSelect startDate={startDate} endDate={endDate}
-                         setDateRangeIndex={setDateRangeIndex} productIndex={productIndex}
-                         setProductIndex={setProductIndex} setWmsLayers={setWmsLayers} />
+          <BasemapSelect />
+          <DateRangePicker />
+          <ProductSelect />
           <ThemeSelect setDarkMode={setDarkMode} />
           <AnimateButton animating={animating} setAnimating={setAnimating} />
           <AnimationTimeSelect animationTime={animationTime} setAnimationTime={setAnimationTime} />
-          <GraphButton graphOn={graphOn} setGraphOn={setGraphOn} map={map} />
+          <GraphButton map={map} />
         </Toolbar>
       </AppBar>
     </Grid>
@@ -65,22 +57,7 @@ export const NavigationBar = ({
 };
 
 NavigationBar.propTypes = {
-  graphOn: PropTypes.bool.isRequired,
-  setGraphOn: PropTypes.func.isRequired,
   map: PropTypes.instanceOf(L.Map).isRequired,
-  startDate: PropTypes.instanceOf(Date).isRequired,
-  setStartDate: PropTypes.func.isRequired,
-  endDate: PropTypes.instanceOf(Date).isRequired,
-  setEndDate: PropTypes.func.isRequired,
-  dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.func.isRequired,
-  basemaps: PropTypes.array.isRequired,
-  basemapIndex: PropTypes.number.isRequired,
-  setBasemapIndex: PropTypes.func.isRequired,
-  productIndex: PropTypes.number.isRequired,
-  setProductIndex: PropTypes.func.isRequired,
-  wmsLayers: PropTypes.array.isRequired,
-  setWmsLayers: PropTypes.func.isRequired,
   animating: PropTypes.bool.isRequired,
   setAnimating: PropTypes.func.isRequired,
   animationTime: PropTypes.number.isRequired,

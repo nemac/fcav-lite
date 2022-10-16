@@ -4,31 +4,25 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import config from '../config';
-import { useStateWithLabel, getWMSLayersYearRange } from '../utils';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  changeProductIndex,
+  selectLayerProperty
+} from '../reducers/layersSlice';
 
-export const ProductSelect = ({
-    startDate, endDate, productIndex, setProductIndex, setWmsLayers
-  }) => {
+export const ProductSelect = () => {
+    const dispatch = useDispatch();
+    const productIndex = useSelector(state => selectLayerProperty(state, 'productIndex'));
+
     const productsList = config.productsList;
   
     const onProductChange = (event) => {
       const index = event.target.value;
-      setProductIndex(index);
-      const newProduct = getWMSLayersYearRange(startDate, endDate, index);
-      setWmsLayers(newProduct);
-      //setDateRangeIndex(0);
+      dispatch(changeProductIndex(index));
     };
   
     return (
         <DropDownSelector buttonText={'Product'} labelId={'fcav-product-select-label'} id={'fcav-product-select'}
         value={productIndex} onChange={onProductChange} options={productsList} />
     );
-  };
-
-  ProductSelect.propTypes = {
-    startDate: PropTypes.instanceOf(Date).isRequired,
-    endDate: PropTypes.instanceOf(Date).isRequired,
-    productIndex: PropTypes.number.isRequired,
-    setProductIndex: PropTypes.func.isRequired,
-    setWmsLayers: PropTypes.func.isRequired
   };

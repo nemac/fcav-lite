@@ -19,6 +19,10 @@ import forwarn2Legend from '../../forwarn2-legend.png';
 import { NDVIMultiYearGraph } from '../NDVIMultiYearGraph';
 import { AnimationController } from '../AnimationController';
 import { useStateWithLabel, useCompare } from '../../utils';
+import { useSelector } from 'react-redux';
+import { selectLayerProperty } from '../../reducers/layersSlice';
+import { selectGraphOn } from '../../reducers/graphSlice';
+import { selectBasemaps, selectBasemapIndex } from '../../reducers/basemapsSlice';
 import './LeafletMap.css';
 
 // This API Key is used to access ArcGIS Online location services
@@ -29,10 +33,18 @@ const center = [37, -98];
 const zoom = 4.5;
 
 const MapController = ({
-  graphOn, currentGraphCoords, setMap, modisData, setModisData, modisDataConfig,
-  setModisDataConfig, startDate, endDate, dateRangeIndex, basemaps,
-  basemapIndex, productIndex, wmsLayers, animating
+  currentGraphCoords, setMap, modisData, setModisData, 
+  modisDataConfig, setModisDataConfig, animating
 }) => {
+  const graphOn = useSelector(selectGraphOn);
+  const startDate = useSelector(state => selectLayerProperty(state, 'startDate'));
+  const endDate = useSelector(state => selectLayerProperty(state, 'endDate'));
+  const dateRangeIndex = useSelector(state => selectLayerProperty(state, 'dateRangeIndex'));
+  const productIndex = useSelector(state => selectLayerProperty(state, 'productIndex'));
+  const wmsLayers = useSelector(state => selectLayerProperty(state, 'wmsLayers'));
+  const basemaps = useSelector(selectBasemaps);
+  const basemapIndex = useSelector(selectBasemapIndex);
+
   const search = ELG.geosearch({
     useMapBounds: false,
     providers: [
@@ -338,10 +350,7 @@ MapController.propTypes = {
   animating: PropTypes.bool.isRequired
 };
 
-export const LeafletMap = ({
-  graphOn, setMap, startDate, endDate, dateRangeIndex, setDateRangeIndex,
-  basemaps, basemapIndex, productIndex, wmsLayers, animating, animationTime
-}) => {
+export const LeafletMap = ({setMap, animating, animationTime}) => {
   const [currentGraphCoords, setCurrentGraphCoords] = useStateWithLabel([0, 0], 'currentGraphCoords');
   const [mapHeight, setMapHeight] = useStateWithLabel('90vh', 'mapHeight');
 
@@ -415,20 +424,13 @@ export const LeafletMap = ({
                       display: 'flex'
                     }}
                 >
-                    <MapController graphOn={graphOn} currentGraphCoords={currentGraphCoords}
-                                   setMap={setMap} modisData={modisData}
+                    <MapController currentGraphCoords={currentGraphCoords} setMap={setMap} modisData={modisData}
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
-                                   setModisDataConfig={setModisDataConfig} startDate={startDate}
-                                   endDate={endDate} dateRangeIndex={dateRangeIndex}
-                                   setDateRangeIndex={setDateRangeIndex} basemaps={basemaps}
-                                   basemapIndex={basemapIndex} productIndex={productIndex}
-                                   wmsLayers={wmsLayers} animating={animating} />
-                    <AnimationController layers={wmsLayers} animating={animating} dateRangeIndex={dateRangeIndex} setDateRangeIndex={setDateRangeIndex} 
-                                         animationTime={animationTime} />
+                                   setModisDataConfig={setModisDataConfig} animating={animating} />
+                    <AnimationController animating={animating} animationTime={animationTime} />
                 </MapContainer>
             </Grid>
-            <NDVIMultiYearGraph graphOn={graphOn} modisData={modisData}
-                                modisDataConfig={modisDataConfig} />
+            <NDVIMultiYearGraph modisData={modisData} modisDataConfig={modisDataConfig} />
         </div>
   );
 };
