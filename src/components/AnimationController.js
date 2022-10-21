@@ -16,6 +16,10 @@ export const AnimationController = ({
   const context = useLeafletContext();
   const [loaded, setLoaded] = useState(false);
 
+  useEffect(() => {
+    console.log('reloaded');
+  })
+
   // Helper function to check if all layers have been loaded
   const allLayersLoaded = () => {
     for (const layer of layers) {

@@ -333,20 +333,12 @@ const MapController = ({
 };
 
 MapController.propTypes = {
-  graphOn: PropTypes.bool.isRequired,
   currentGraphCoords: PropTypes.array.isRequired,
   setMap: PropTypes.func.isRequired,
   modisData: PropTypes.object.isRequired,
   setModisData: PropTypes.func.isRequired,
   modisDataConfig: PropTypes.object.isRequired,
   setModisDataConfig: PropTypes.func.isRequired,
-  startDate: PropTypes.instanceOf(Date).isRequired,
-  endDate: PropTypes.instanceOf(Date).isRequired,
-  dateRangeIndex: PropTypes.number.isRequired,
-  basemaps: PropTypes.array.isRequired,
-  basemapIndex: PropTypes.number.isRequired,
-  productIndex: PropTypes.number.isRequired,
-  wmsLayers: PropTypes.array.isRequired,
   animating: PropTypes.bool.isRequired
 };
 
@@ -436,16 +428,7 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
 };
 
 LeafletMap.propTypes = {
-  graphOn: PropTypes.bool.isRequired,
   setMap: PropTypes.func.isRequired,
-  startDate: PropTypes.instanceOf(Date).isRequired,
-  endDate: PropTypes.instanceOf(Date).isRequired,
-  dateRangeIndex: PropTypes.number.isRequired,
-  setDateRangeIndex: PropTypes.func.isRequired,
-  basemaps: PropTypes.array.isRequired,
-  basemapIndex: PropTypes.number.isRequired,
-  productIndex: PropTypes.number.isRequired,
-  wmsLayers: PropTypes.array.isRequired,
   animating: PropTypes.bool.isRequired,
   animationTime: PropTypes.number.isRequired
 };
