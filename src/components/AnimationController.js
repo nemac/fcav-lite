@@ -3,7 +3,7 @@ import { useLeafletContext } from '@react-leaflet/core';
 import PropTypes from 'prop-types';
 import 'leaflet-spin';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLayerProperty, changeDateRangeIndex, incrementDateRangeIndex } from '../reducers/layersSlice';
+import { selectLayerProperty, changeDateRangeIndex, incrementDateRangeIndex, incrementDateRangeIndexAsync } from '../reducers/layersSlice';
 
 export const AnimationController = ({ 
   animating, animationTime 
@@ -59,18 +59,27 @@ export const AnimationController = ({
     });
     layer.leafletLayer.bringToFront();
     layer.leafletLayer.setOpacity(1);
-    const timer = setTimeout(() => {
-      if (dateRangeIndex === layers.length - 1) {
-        dispatch(changeDateRangeIndex(0));
-      } else {
-        dispatch(incrementDateRangeIndex());
-      }
-      layer.leafletLayer.setOpacity(0);
-    }, animationTime * timeMultiplicationFactor);
-    return () => { clearTimeout(timer); };
+
+    if (dateRangeIndex == layers.length - 1) {
+      dispatch(changeDateRangeIndex(0))
+    } else {
+      dispatch(incrementDateRangeIndexAsync());
+    }
+
+    // const timer = setTimeout(() => {
+    //   if (dateRangeIndex === layers.length - 1) {
+    //     dispatch(changeDateRangeIndex(0));
+    //   } else {
+    //     dispatch(incrementDateRangeIndex()).then(
+    //       layer.leafletLayer.setOpacity(0);
+    //     );
+    //   }
+    //   layer.leafletLayer.setOpacity(0);
+    // }, animationTime * timeMultiplicationFactor);
+    //return () => { clearTimeout(timer); };
   }, [animating, dateRangeIndex, loaded]);
   
-  // Initial load
+  // Adds layers to the map and cleans up upon exit from animation
   useEffect(() => {
     if (!animating) {
       setLoaded(false);
