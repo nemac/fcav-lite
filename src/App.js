@@ -19,7 +19,7 @@ const App = () => {
       <div>
           <NavigationBar map={map} animating={animating} setAnimating={setAnimating} animationTime={animationTime} 
                         setAnimationTime={setAnimationTime} />
-          <LeafletMap setMap={setMap} animating={animating} setAnimating={setAnimating} />
+          <LeafletMap setMap={setMap} animating={animating} animationTime={animationTime} />
       </div>
   );
 };

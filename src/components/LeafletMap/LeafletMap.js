@@ -214,6 +214,20 @@ const MapController = ({
       map.removeLayer(layer);
     });
   };
+
+  // Utility to make layers transparent and send them to back
+  const prepareMap = () => {
+    console.log('Making layers transparent...');
+    map.eachLayer(layer => {
+      // Don't make the basemap transparent!
+      if (basemapRef.current == layer) {
+        return;
+      }
+      layer.bringToBack();
+      layer.setOpacity(0);
+    });
+  };
+
   // console.log(useCompare(basemapIndex));
   // Hook: basemap change
   useEffect(() => {
@@ -252,14 +266,10 @@ const MapController = ({
 
   // Hook: date range and product change
   useEffect(() => {
-    // if animating, we don't want to do this
-    if (animating) {
-      return;
-    }
     
     if (hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged || hasStartDateChanged || hasEndDateChanged) {
       //        console.log("date range index hook");
-      clearMap();
+      prepareMap();
       const layer = wmsLayers[dateRangeIndex];
       console.log('new layer: ');
       console.log(layer);

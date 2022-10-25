@@ -44,7 +44,6 @@ export const AnimationController = ({
 
     console.log('Will I animate?');
     console.log(layersLoaded ? "All layers loaded" : "Not loaded.");
-    console.log(layers[0]);
 
     if (!layersLoaded) {
       context.map.spin(true);
@@ -53,31 +52,22 @@ export const AnimationController = ({
 
     context.map.spin(false);
     console.log('Updating frame.');
-    const layer = layers[dateRangeIndex];
-    layers.forEach((_layer) => {
-      _layer.leafletLayer.bringToBack();
-    });
-    layer.leafletLayer.bringToFront();
-    layer.leafletLayer.setOpacity(1);
 
-    if (dateRangeIndex == layers.length - 1) {
-      dispatch(changeDateRangeIndex(0))
-    } else {
-      dispatch(incrementDateRangeIndexAsync());
-    }
+    // if (dateRangeIndex == layers.length - 1) {
+    //   dispatch(changeDateRangeIndex(0))
+    // } else {
+    //   dispatch(incrementDateRangeIndexAsync());
+    // }
 
-    // const timer = setTimeout(() => {
-    //   if (dateRangeIndex === layers.length - 1) {
-    //     dispatch(changeDateRangeIndex(0));
-    //   } else {
-    //     dispatch(incrementDateRangeIndex()).then(
-    //       layer.leafletLayer.setOpacity(0);
-    //     );
-    //   }
-    //   layer.leafletLayer.setOpacity(0);
-    // }, animationTime * timeMultiplicationFactor);
-    //return () => { clearTimeout(timer); };
-  }, [animating, dateRangeIndex, loaded]);
+    const timer = setTimeout(() => {
+      if (dateRangeIndex === layers.length - 1) {
+        dispatch(changeDateRangeIndex(0));
+      } else {
+        dispatch(incrementDateRangeIndex());
+      }
+    }, animationTime * timeMultiplicationFactor);
+    return () => { clearTimeout(timer); };
+  }, [animating, animationTime, dateRangeIndex, loaded]);
   
   // Adds layers to the map and cleans up upon exit from animation
   useEffect(() => {
@@ -87,7 +77,6 @@ export const AnimationController = ({
       return;
     }
 
-    console.log('Hey there!');
     layers.forEach((layer) => {
       layer.leafletLayer.on('load', allLayersLoaded);
       if (!context.map.hasLayer(layer.leafletLayer)) {
@@ -100,10 +89,8 @@ export const AnimationController = ({
         console.log(layer);
       }
 
-    //document.body.style.cursor='wait';
-    //setDateRangeIndex(0);
-  }, [layers, animating]);
-});
+  });
+}, [layers, animating]);
 
   return null;
 };
