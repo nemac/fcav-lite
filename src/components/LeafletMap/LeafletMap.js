@@ -18,7 +18,7 @@ import { parse } from 'fast-xml-parser';
 import forwarn2Legend from '../../forwarn2-legend.png';
 import { NDVIMultiYearGraph } from '../NDVIMultiYearGraph';
 import { AnimationController } from '../AnimationController';
-import { useStateWithLabel, useCompare } from '../../utils';
+import { useStateWithLabel, useCompare, getLeafletLayer } from '../../utils';
 import { useSelector } from 'react-redux';
 import { selectLayerProperty } from '../../reducers/layersSlice';
 import { selectGraphOn } from '../../reducers/graphSlice';
@@ -45,8 +45,10 @@ const MapController = ({
   const basemaps = useSelector(selectBasemaps);
   const basemapIndex = useSelector(selectBasemapIndex);
 
+  const [leafletLayers, setLeafletLayers] = useState({});
+
   const search = ELG.geosearch({
-    useMapBounds: false,
+    useMapBounds: false, 
     providers: [
       ELG.arcgisOnlineProvider({
         apikey: apiKey
@@ -59,6 +61,33 @@ const MapController = ({
   useEffect(() => {
     setMap(map);
   }, []);
+
+  // Update layers hook adds new layers to the map and removes old layers, also updating the leafletLayers array.
+  useEffect(() => {
+    setLeafletLayers(prevLeafletLayers => {
+      const newLeafletLayers = {};
+      
+      for (const url in prevLeafletLayers) {
+        if (!Object.keys(wmsLayers).some(_url => _url === url)) {
+          map.removeLayer(prevLeafletLayers[url]);
+        }
+      }
+
+      for (const url in wmsLayers) {
+        if (Object.keys(prevLeafletLayers).some(_url => _url === url)) {
+          newLeafletLayers[url] = prevLeafletLayers[url];
+        } else {
+          const leafletLayer = getLeafletLayer(wmsLayers[url]);
+          newLeafletLayers[url] = leafletLayer;
+          console.log(newLeafletLayers);
+          map.addLayer(leafletLayer);
+          leafletLayer.bringToBack();
+        }
+      }
+
+      return newLeafletLayers;
+    });
+  }, [wmsLayers]);
 
   const basemapRef = useRef();
 
@@ -199,22 +228,6 @@ const MapController = ({
     return dateIndex;
   };
 
-  // Clear map utility
-  const clearMap = () => {
-    console.log('Clearing map...');
-    // basemapRef.current.bringToBack()
-    map.eachLayer((layer) => {
-      if (basemapRef.current === layer) {
-        //          console.log("Skipping basemap layer...")
-        //          console.log(basemapRef.current)
-        return;
-      }
-      console.log('Removing layer: ');
-      console.log(layer);
-      map.removeLayer(layer);
-    });
-  };
-
   // Utility to make layers transparent and send them to back
   const prepareMap = () => {
     console.log('Making layers transparent...');
@@ -223,6 +236,7 @@ const MapController = ({
       if (basemapRef.current == layer) {
         return;
       }
+      
       layer.bringToBack();
       layer.setOpacity(0);
     });
@@ -242,7 +256,7 @@ const MapController = ({
         opacity: 0,
         attribution: newBasemap.attribution
       });
-      //
+      
       map.addLayer(leafletLayer);
       leafletLayer.bringToBack();
       leafletLayer.setOpacity(1);
@@ -260,25 +274,26 @@ const MapController = ({
     if (hasProductIndexChanged || isInitialRender) {
       console.log('Product change hook');
       // console.log(newWMS);
-      clearMap();
+      //clearMap();
     }
   }, [hasProductIndexChanged, productIndex]);
 
   // Hook: date range and product change
   useEffect(() => {
-    
+    console.log(leafletLayers);
+
+    if (Object.keys(leafletLayers).length == 0) {
+      return;
+    }
+
     if (hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged || hasStartDateChanged || hasEndDateChanged) {
       //        console.log("date range index hook");
       prepareMap();
-      const layer = wmsLayers[dateRangeIndex];
+      const layer = Object.values(leafletLayers)[dateRangeIndex];
       console.log('new layer: ');
       console.log(layer);
-      if (!map.hasLayer(layer.leafletLayer)) {
-        console.log('adding layer to the map...');
-        map.addLayer(layer.leafletLayer);
-      }
-      layer.leafletLayer.bringToFront();
-      layer.leafletLayer.setOpacity(1);
+      layer.bringToFront();
+      layer.setOpacity(1);
       if (graphOn) {
         // chartLineValue();
         const newLineValue = { ...modisDataConfig };
@@ -288,18 +303,8 @@ const MapController = ({
         setModisDataConfig(newLineValue);
       }
     }
-  }, [hasDateRangeIndexChanged, hasStartDateChanged, hasEndDateChanged, dateRangeIndex, productIndex, startDate, endDate]);
+  }, [leafletLayers, hasDateRangeIndexChanged, hasStartDateChanged, hasEndDateChanged, dateRangeIndex, productIndex, startDate, endDate]);
 
-  // Hook: Animation button clicked - add all layers to the map
-  // useEffect(() => {
-  //   if (!animating) { return; }
-  //   wmsLayers.forEach((layer) => {
-  //     layer.leafletLayer.setOpacity(0);
-  //     if (!map.hasLayer(layer.leafletLayer)) {
-  //       map.addLayer(layer.leafletLayer);
-  //     }
-  //   });
-  // }, [animating]);
   // hook: has date range changed - update graph data range
   useEffect(() => {
     if (hasStartDateChanged || hasEndDateChanged) {
@@ -308,6 +313,7 @@ const MapController = ({
       }
     }
   }, [hasStartDateChanged, hasEndDateChanged, startDate, endDate]);
+
   // hook: different coordinates selected, update graph data
   useEffect(() => {
     if (hasGraphCoordsChanged) {

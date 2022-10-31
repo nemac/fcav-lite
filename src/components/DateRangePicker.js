@@ -97,7 +97,7 @@ export const DateRangePicker = () => {
         step={1}
         marks
         min={0}
-        max={wmsLayers.length - 1}
+        max={Object.keys(wmsLayers).length - 1}
         onChangeCommitted={ onSliderChange }
       />
     </div>

@@ -119,4 +119,5 @@ const config = {
     'Light'
   ]
 };
+
 export default config;

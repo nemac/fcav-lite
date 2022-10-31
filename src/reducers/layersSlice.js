@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getWMSLayersYearRange } from "../utils";
+import { getWmsLayerObjects } from "../utils";
 
 const startDate = '2021-01-02';
 const endDate = '2021-02-17';
 
 const initialState = {
-    wmsLayers: getWMSLayersYearRange(new Date(startDate), new Date(endDate), 0),
+    wmsLayers: getWmsLayerObjects(new Date(startDate), new Date(endDate), 0),
     startDate,
     endDate,
     dateRangeIndex: 0,
@@ -13,15 +13,7 @@ const initialState = {
 };
 
 const updateWmsLayers = state => 
-    state.wmsLayers = getWMSLayersYearRange(new Date(state.startDate), new Date(state.endDate), state.productIndex);
-
-export const incrementDateRangeIndexAsync = () => {
-    return (dispatch, getState) => {
-        setTimeout(() => {
-              dispatch(incrementDateRangeIndex(getState()));
-          }, 1000);
-    }
-}
+    state.wmsLayers = getWmsLayerObjects(new Date(state.startDate), new Date(state.endDate), state.productIndex);
 
 const layersSlice = createSlice({
     name: 'layers',

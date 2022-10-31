@@ -18,27 +18,31 @@ export const useCompare = (val) => {
 };
 
 // Helper hook
-const usePrevious = (value) => {
+const usePrevious = value => {
   const ref = useRef();
+
   useEffect(() => {
     ref.current = value;
-  });
+  }, [value]);
+
   return ref.current;
 };
 
-export const getWMSLayersYearRange = (startDate, endDate, productIdx) => {
-  const wmsLayers = [];
+// Return a dictionary of layer objects indexed by URL WITHOUT the leaflet layer classes
+export const getWmsLayerObjects = (startDate, endDate, productIndex) => {
+  const wmsLayers = {};
   let tempDate = getNextFWDate(startDate);
-  //    console.log("tempdate: " + tempDate);
-  //setNumLayersLoaded(0);
+
   while (tempDate <= endDate) {
-    const wmsdate = toWMSDate(tempDate);
-    const o = config.wms_template(wmsdate, productIdx);
-    o.leafletLayer = L.tileLayer.wms(o.baseUrl, o.options);
-    o.date = tempDate;
-    wmsLayers.push(o);
+    const wmsDate = toWMSDate(tempDate);
+    const layerObject = config.wms_template(wmsDate, productIndex);
+    wmsLayers[layerObject.baseUrl + '/' + layerObject.options.layers] = layerObject;
     tempDate.setDate(tempDate.getDate() + 1);
     tempDate = getNextFWDate(tempDate);
   }
+
+  console.log(wmsLayers);
   return wmsLayers;
-};
+}
+
+export const getLeafletLayer = wmsLayerObject => L.tileLayer.wms(wmsLayerObject.baseUrl, wmsLayerObject.options);

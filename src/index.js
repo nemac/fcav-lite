@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import 'leaflet/dist/leaflet.css';
 import App from './App';
 // import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
@@ -24,11 +24,10 @@ import CustomThemeProvider from './CustomThemeProvider';
   }
 }); */
 const rootElement = document.getElementById('app');
-ReactDOM.render(
+const root = createRoot(rootElement);
+root.render(
   <Provider store={store}>
     <CustomThemeProvider>
       <App/>
     </CustomThemeProvider>
-  </Provider>,
-  rootElement
-);
+  </Provider>);
