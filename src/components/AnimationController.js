@@ -44,7 +44,7 @@ export const AnimationController = ({
     console.log('Updating frame.');
 
     const timer = setTimeout(() => {
-      if (dateRangeIndex === layers.length - 1) {
+      if (dateRangeIndex === Object.keys(layers).length - 1) {
         dispatch(changeDateRangeIndex(0));
       } else {
         console.log('hahahaha');

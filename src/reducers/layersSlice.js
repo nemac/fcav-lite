@@ -31,7 +31,7 @@ const layersSlice = createSlice({
             state.dateRangeIndex = action.payload;
         },
         incrementDateRangeIndex(state) {
-            if (state.dateRangeIndex < state.wmsLayers.length - 1) {
+            if (state.dateRangeIndex < Object.keys(state.wmsLayers).length - 1) {
                 state.dateRangeIndex++;
             }
         },

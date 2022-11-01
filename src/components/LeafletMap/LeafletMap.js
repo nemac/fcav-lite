@@ -62,7 +62,7 @@ const MapController = ({
     setMap(map);
   }, []);
 
-  // Update layers hook adds new layers to the map and removes old layers, also updating the leafletLayers array.
+  // Update layers hook adds new layers to the map and removes old layers, also updating the leafletLayers object.
   useEffect(() => {
     setLeafletLayers(prevLeafletLayers => {
       const newLeafletLayers = {};
@@ -236,7 +236,7 @@ const MapController = ({
       if (basemapRef.current == layer) {
         return;
       }
-      
+
       layer.bringToBack();
       layer.setOpacity(0);
     });
