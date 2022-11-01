@@ -30,6 +30,8 @@ export const AnimationController = ({
       return;
     }
 
+    console.log("value of loaded: " + loaded);
+
     // call again to get most up to date value
     const layersLoaded = allLayersLoaded();
 
@@ -47,7 +49,6 @@ export const AnimationController = ({
       if (dateRangeIndex === Object.keys(layers).length - 1) {
         dispatch(changeDateRangeIndex(0));
       } else {
-        console.log('hahahaha');
         dispatch(incrementDateRangeIndex());
       }
     }, animationTime * timeMultiplicationFactor);
@@ -55,7 +56,7 @@ export const AnimationController = ({
     return () => clearTimeout(timer);
   }, [animating, animationTime, dateRangeIndex, loaded]);
   
-  // Adds layers to the map and cleans up upon exit from animation
+  // Adds helper function to make layers and cleans up upon exit from animation
   useEffect(() => {
     if (!animating) {
       setLoaded(false);

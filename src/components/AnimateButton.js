@@ -12,7 +12,7 @@ export const AnimateButton = ({animating, setAnimating}) => {
       <Button
         letiant="contained"
         color="secondary"
-        startIcon={ animating ? <StopIcon/> : <PlayArrowIcon />}
+        startIcon={ animating ? <StopIcon /> : <PlayArrowIcon />}
         onClick={onAnimate}
         >{ animating ? "Stop" : "Play" }
       </Button>

@@ -34,7 +34,7 @@ const zoom = 4.5;
 
 const MapController = ({
   currentGraphCoords, setMap, modisData, setModisData, 
-  modisDataConfig, setModisDataConfig, animating
+  modisDataConfig, setModisDataConfig
 }) => {
   const graphOn = useSelector(selectGraphOn);
   const startDate = useSelector(state => selectLayerProperty(state, 'startDate'));
@@ -269,25 +269,9 @@ const MapController = ({
     }
   }, [hasBaseMapChanged, basemapIndex]);
 
-  // Hook: product change
+  // Hook: leaflet layers and date range index change hook
   useEffect(() => {
-    if (hasProductIndexChanged || isInitialRender) {
-      console.log('Product change hook');
-      // console.log(newWMS);
-      //clearMap();
-    }
-  }, [hasProductIndexChanged, productIndex]);
-
-  // Hook: date range and product change
-  useEffect(() => {
-    console.log(leafletLayers);
-
-    if (Object.keys(leafletLayers).length == 0) {
-      return;
-    }
-
-    if (hasDateRangeIndexChanged || isInitialRender || hasProductIndexChanged || hasStartDateChanged || hasEndDateChanged) {
-      //        console.log("date range index hook");
+    if (Object.keys(leafletLayers).length !== 0) {
       prepareMap();
       const layer = Object.values(leafletLayers)[dateRangeIndex];
       console.log('new layer: ');
@@ -303,7 +287,7 @@ const MapController = ({
         setModisDataConfig(newLineValue);
       }
     }
-  }, [leafletLayers, hasDateRangeIndexChanged, hasStartDateChanged, hasEndDateChanged, dateRangeIndex, productIndex, startDate, endDate]);
+  }, [leafletLayers, hasDateRangeIndexChanged, dateRangeIndex]);
 
   // hook: has date range changed - update graph data range
   useEffect(() => {
@@ -355,7 +339,6 @@ MapController.propTypes = {
   setModisData: PropTypes.func.isRequired,
   modisDataConfig: PropTypes.object.isRequired,
   setModisDataConfig: PropTypes.func.isRequired,
-  animating: PropTypes.bool.isRequired
 };
 
 export const LeafletMap = ({setMap, animating, animationTime}) => {
@@ -434,7 +417,7 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
                 >
                     <MapController currentGraphCoords={currentGraphCoords} setMap={setMap} modisData={modisData}
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
-                                   setModisDataConfig={setModisDataConfig} animating={animating} />
+                                   setModisDataConfig={setModisDataConfig} />
                     <AnimationController animating={animating} animationTime={animationTime} />
                 </MapContainer>
             </Grid>
