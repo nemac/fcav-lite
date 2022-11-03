@@ -27,18 +27,21 @@ export const AnimationController = ({
   // Frame update hook
   useEffect(() => {
     if (!animating) {
+      setLoaded(false);
+      map.spin(false);
       return;
     }
 
     console.log("value of loaded: " + loaded);
 
-    // call again to get most up to date value
+    //call again to get most up to date value
     const layersLoaded = allLayersLoaded();
 
     console.log(layersLoaded ? "All layers loaded" : "Not loaded.");
 
     if (!layersLoaded) {
       map.spin(true);
+      map.eachLayer(layer => layer.on('load', allLayersLoaded));
       return;
     }
 
@@ -55,17 +58,6 @@ export const AnimationController = ({
 
     return () => clearTimeout(timer);
   }, [animating, animationTime, dateRangeIndex, loaded]);
-  
-  // Adds helper function to make layers and cleans up upon exit from animation
-  useEffect(() => {
-    if (!animating) {
-      setLoaded(false);
-      map.spin(false);
-      return;
-    }
-
-    map.eachLayer(layer => layer.on('load', allLayersLoaded));  // Every time a layer loads, we call the helper function again.
-  }, [map, animating]);
 
   return null;
 };
