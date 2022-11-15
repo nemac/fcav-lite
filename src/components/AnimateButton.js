@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 export const AnimateButton = ({animating, setAnimating}) => {
     const onAnimate = (e, v) => {
-        setAnimating(!animating);
+        setAnimating(prevAnimating => !prevAnimating);
       }
 
     return (

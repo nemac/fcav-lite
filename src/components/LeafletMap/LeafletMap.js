@@ -9,6 +9,7 @@ import React, {
 import { Grid } from '@material-ui/core';
 import { MapContainer, useMap } from 'react-leaflet';
 import 'leaflet-loading';
+import 'leaflet-loading/src/Control.Loading';
 import 'leaflet-loading/src/Control.Loading.css';
 // suggested here: https://stackoverflow.com/questions/66519812/esri-leaflet-geocoder-component-not-rendering-how-to-connect-providers-in-prod
 import * as ELG  from 'esri-leaflet-geocoder';
@@ -61,6 +62,11 @@ const MapController = ({
   useEffect(() => {
     setMap(map);
   }, []);
+
+  // Add loading indicator to map
+  map.addControl(L.Control.loading({
+    separate: true
+  }));
 
   // Update layers hook adds new layers to the map and removes old layers, also updating the leafletLayers object.
   useEffect(() => {
@@ -306,6 +312,7 @@ const MapController = ({
       }
     }
   }, [hasGraphCoordsChanged, currentGraphCoords]);
+
   if (isInitialRender) { // check if initilization is complete so we don't reinitilize components
     search.addTo(map);
     const legend = L.control({ position: 'bottomright' });
@@ -400,7 +407,7 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
             <Grid item xs={12}>
                 <MapContainer
                     className='mapContainer'
-                    // loadingControl={true}
+                    loadingControl={true}
                     whenCreated={(map) => {
                       map.on('click', (e) => {
                         const { lat, lng } = e.latlng;

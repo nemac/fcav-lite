@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMap } from 'react-leaflet/hooks';
 import PropTypes from 'prop-types';
-import 'leaflet-spin';
+//import 'leaflet-spin';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLayerProperty, changeDateRangeIndex, incrementDateRangeIndex } from '../reducers/layersSlice';
 
@@ -13,6 +13,7 @@ export const AnimationController = ({
   const dateRangeIndex = useSelector(state => selectLayerProperty(state, 'dateRangeIndex'));
   
   const timeMultiplicationFactor = 1000; // number of milliseconds per second of animation time
+  const loadingCheckInterval = 50; // interval in milliseconds
   const map = useMap();
   const [loaded, setLoaded] = useState(false);
 
@@ -24,35 +25,45 @@ export const AnimationController = ({
     return layersLoaded;
   }
 
-  // Frame update hook
+  // Hook to check if layers are loaded at regular intervals
+  useEffect(() => {
+    const interval = setInterval(() => {
+      allLayersLoaded();
+    }, loadingCheckInterval);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Animation handling hook
   useEffect(() => {
     if (!animating) {
       setLoaded(false);
-      map.spin(false);
+      map.fire('dataload');
       return;
     }
 
-    console.log("value of loaded: " + loaded);
-
     //call again to get most up to date value
     const layersLoaded = allLayersLoaded();
-
+        
     console.log(layersLoaded ? "All layers loaded" : "Not loaded.");
 
     if (!layersLoaded) {
-      map.spin(true);
+      console.log("Setting spin to true");
+      map.fire('dataloading');
       map.eachLayer(layer => layer.on('load', allLayersLoaded));
       return;
     }
 
-    map.spin(false);
+    map.fire('dataload');
     console.log('Updating frame.');
 
     const timer = setTimeout(() => {
-      if (dateRangeIndex === Object.keys(layers).length - 1) {
-        dispatch(changeDateRangeIndex(0));
-      } else {
-        dispatch(incrementDateRangeIndex());
+      if (allLayersLoaded()) {
+        if (dateRangeIndex === Object.keys(layers).length - 1) {
+          dispatch(changeDateRangeIndex(0));
+        } else {
+          dispatch(incrementDateRangeIndex());
+        }
       }
     }, animationTime * timeMultiplicationFactor);
 

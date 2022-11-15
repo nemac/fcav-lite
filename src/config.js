@@ -1,5 +1,6 @@
 const config = {
   juliandates: ['001', '009', '017', '025', '033', '041', '049', '057', '065', '073', '081', '089', '097', '105', '113', '121', '129', '137', '145', '153', '161', '169', '177', '185', '193', '201', '209', '217', '225', '233', '241', '249', '257', '265', '273', '281', '289', '297', '305', '313', '321', '329', '337', '345', '353', '361'],
+  
   wms_template(datestring, index) {
     // from prior year
     const sampleLayer = [
@@ -12,8 +13,7 @@ const config = {
           tileSize: 2048,
           uppercase: true,
           opacity: 0
-        },
-        leafletLayer: ''
+        }
       },
       // early detect
       {
@@ -25,8 +25,7 @@ const config = {
           tileSize: 2048,
           uppercase: true,
           opacity: 0
-        },
-        leafletLayer: ''
+        }
       },
       // 3 year max
       {
@@ -38,8 +37,7 @@ const config = {
           tileSize: 2048,
           uppercase: true,
           opacity: 0
-        },
-        leafletLayer: ''
+        }
       },
       // 5 year max
       {
@@ -51,8 +49,7 @@ const config = {
           tileSize: 2048,
           uppercase: true,
           opacity: 0
-        },
-        leafletLayer: ''
+        }
       },
       // all year median
       {
@@ -64,12 +61,31 @@ const config = {
           tileSize: 2048,
           uppercase: true,
           opacity: 0
-        },
-        leafletLayer: ''
-      }
+        }
+      },
     ];
     return sampleLayer[index];
   },
+
+  overlay_template(dateYearString, index) {
+    const sampleLayer = [
+        // insect and disease
+        {
+          baseUrl: 'https://fswms.nemac.org/ads',
+          options: {
+            layers: `ads_${dateYearString}_poly`,
+            format: 'image/png',
+            transparent: true,
+            tileSize: 2048,
+            uppercase: true,
+            opacity: 0
+          },
+        },
+    ];
+
+    return sampleLayer[index];
+  },
+
   baseLayers: [
     {
       name: 'Streets',
@@ -107,6 +123,7 @@ const config = {
       theme: 'dark'
     }
   ],
+
   productsList: [
     'From Prior Year',
     'Early Detect',
@@ -114,6 +131,7 @@ const config = {
     'From Prior 5-Year 90th Percentile',
     'From All-Prior-Year Median'
   ],
+
   themesList: [
     'Dark',
     'Light'
