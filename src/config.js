@@ -132,6 +132,10 @@ const config = {
     'From All-Prior-Year Median'
   ],
 
+  overlaysList: [
+    'Insect and Disease Surveys'
+  ],
+
   themesList: [
     'Dark',
     'Light'

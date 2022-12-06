@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { Grid } from '@material-ui/core';
 import { MapContainer, useMap } from 'react-leaflet';
+import 'leaflet-spin';
 import 'leaflet-loading';
 import 'leaflet-loading/src/Control.Loading';
 import 'leaflet-loading/src/Control.Loading.css';
@@ -25,6 +26,7 @@ import { selectLayerProperty } from '../../reducers/layersSlice';
 import { selectGraphOn } from '../../reducers/graphSlice';
 import { selectBasemaps, selectBasemapIndex } from '../../reducers/basemapsSlice';
 import './LeafletMap.css';
+import { OfflineBolt } from '@material-ui/icons';
 
 // This API Key is used to access ArcGIS Online location services
 const apiKey = 'AAPK193b1a907b48469f98a0d22c7e27c57d_8CPajLDlUjQfkzjt4nWhAM0cjYe_8sRYBBnG0_iVP74XPYKqbQU3uhduKsl_pBs';
@@ -43,6 +45,7 @@ const MapController = ({
   const dateRangeIndex = useSelector(state => selectLayerProperty(state, 'dateRangeIndex'));
   const productIndex = useSelector(state => selectLayerProperty(state, 'productIndex'));
   const wmsLayers = useSelector(state => selectLayerProperty(state, 'wmsLayers'));
+  const overlayLayers = useSelector(state => selectLayerProperty(state, 'overlayLayers'));
   const basemaps = useSelector(selectBasemaps);
   const basemapIndex = useSelector(selectBasemapIndex);
 
@@ -63,28 +66,28 @@ const MapController = ({
     setMap(map);
   }, []);
 
-  // Add loading indicator to map
-  map.addControl(L.Control.loading({
-    separate: true
-  }));
-
   // Update layers hook adds new layers to the map and removes old layers, also updating the leafletLayers object.
   useEffect(() => {
     setLeafletLayers(prevLeafletLayers => {
       const newLeafletLayers = {};
       
+      const layerObjects = wmsLayers.concat(overlayLayers);
+      console.log("Layer objects: ");
+      console.log(layerObjects);
+
       for (const url in prevLeafletLayers) {
-        if (!Object.keys(wmsLayers).some(_url => _url === url)) {
+        if (!layerObjects.some(object => object.url === url)) {
           map.removeLayer(prevLeafletLayers[url]);
         }
       }
 
-      for (const url in wmsLayers) {
-        if (Object.keys(prevLeafletLayers).some(_url => _url === url)) {
-          newLeafletLayers[url] = prevLeafletLayers[url];
+      for (const object of layerObjects) {
+        if (Object.keys(prevLeafletLayers).some(url => url === object.url)) {
+          newLeafletLayers[object.url] = prevLeafletLayers[object.url];
         } else {
-          const leafletLayer = getLeafletLayer(wmsLayers[url]);
-          newLeafletLayers[url] = leafletLayer;
+          const leafletLayer = getLeafletLayer(object);
+          console.log("Object: " + object);
+          newLeafletLayers[object.url] = leafletLayer;
           console.log(newLeafletLayers);
           map.addLayer(leafletLayer);
           leafletLayer.bringToBack();
@@ -93,7 +96,7 @@ const MapController = ({
 
       return newLeafletLayers;
     });
-  }, [wmsLayers]);
+  }, [wmsLayers, overlayLayers]);
 
   const basemapRef = useRef();
 
@@ -277,21 +280,27 @@ const MapController = ({
 
   // Hook: leaflet layers and date range index change hook
   useEffect(() => {
-    if (Object.keys(leafletLayers).length !== 0) {
-      prepareMap();
-      const layer = Object.values(leafletLayers)[dateRangeIndex];
-      console.log('new layer: ');
-      console.log(layer);
-      layer.bringToFront();
-      layer.setOpacity(1);
-      if (graphOn) {
-        // chartLineValue();
-        const newLineValue = { ...modisDataConfig };
-        newLineValue.plugins.annotation.annotations[0].value = getChartLineValue();
-        newLineValue.plugins.annotation.annotations[0].label.content =
-        modisData.labels[dateRangeIndex];
-        setModisDataConfig(newLineValue);
-      }
+    prepareMap();
+    const wmsLayerUrl = wmsLayers[dateRangeIndex].url;
+    const overlayLayerUrl = overlayLayers[dateRangeIndex].url;
+    console.log("overlay layers: ");
+    console.log(overlayLayers);
+    console.log("Overlay layer url: " + overlayLayerUrl);
+    const wmsLayer = leafletLayers[wmsLayerUrl];
+    const overlayLayer = leafletLayers[overlayLayerUrl];
+
+    if (wmsLayer !== undefined && overlayLayer !== undefined) {
+      wmsLayer.bringToFront();
+      wmsLayer.setOpacity(1);
+      overlayLayer.bringToFront();
+      overlayLayer.setOpacity(1);}
+    if (graphOn) {
+      // chartLineValue();
+      const newLineValue = { ...modisDataConfig };
+      newLineValue.plugins.annotation.annotations[0].value = getChartLineValue();
+      newLineValue.plugins.annotation.annotations[0].label.content =
+      modisData.labels[dateRangeIndex];
+      setModisDataConfig(newLineValue);
     }
   }, [leafletLayers, hasDateRangeIndexChanged, dateRangeIndex]);
 

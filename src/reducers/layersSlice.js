@@ -1,19 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getWmsLayerObjects } from "../utils";
+import { getOverlayLayerObjects, getWmsLayerObjects } from "../utils";
 
 const startDate = '2021-01-02';
 const endDate = '2021-02-17';
 
 const initialState = {
+    overlayLayers: getOverlayLayerObjects(new Date(startDate), new Date(endDate), 0),
     wmsLayers: getWmsLayerObjects(new Date(startDate), new Date(endDate), 0),
     startDate,
     endDate,
     dateRangeIndex: 0,
-    productIndex: 0
+    productIndex: 0,
+    overlayIndex: 0
 };
 
-const updateWmsLayers = state => 
+const updateLayers = state => {
     state.wmsLayers = getWmsLayerObjects(new Date(state.startDate), new Date(state.endDate), state.productIndex);
+    state.overlayLayers = getOverlayLayerObjects(new Date(state.startDate), new Date(state.endDate), state.overlayIndex);
+};
 
 const layersSlice = createSlice({
     name: 'layers',
@@ -21,11 +25,11 @@ const layersSlice = createSlice({
     reducers: {
         changeStartDate(state, action) {
             state.startDate = action.payload;
-            updateWmsLayers(state);
+            updateLayers(state);
         },
         changeEndDate(state, action) {
             state.endDate = action.payload;
-            updateWmsLayers(state);
+            updateLayers(state);
         },
         changeDateRangeIndex(state, action) {
             state.dateRangeIndex = action.payload;
@@ -37,7 +41,11 @@ const layersSlice = createSlice({
         },
         changeProductIndex(state, action) {
             state.productIndex = action.payload;
-            updateWmsLayers(state);
+            updateLayers(state);
+        },
+        changeOverlayIndex(state, action) {
+            state.overlayIndex = action.payload;
+            updateLayers(state);
         }
     }
 });
@@ -49,6 +57,7 @@ export const {
     changeEndDate, 
     changeDateRangeIndex,
     incrementDateRangeIndex, 
-    changeProductIndex } = layersSlice.actions;
+    changeProductIndex,
+    changeOverlayIndex } = layersSlice.actions;
 
 export default layersSlice.reducer;

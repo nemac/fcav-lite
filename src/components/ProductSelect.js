@@ -3,22 +3,19 @@ import React, {
   useContext, useDebugValue, useEffect, useState
 } from 'react';
 import PropTypes from 'prop-types';
-import config from '../config';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   changeProductIndex,
   selectLayerProperty
 } from '../reducers/layersSlice';
 
-export const ProductSelect = () => {
+export const ProductSelect = ({selector, actionCreator, productsList}) => {
     const dispatch = useDispatch();
-    const productIndex = useSelector(state => selectLayerProperty(state, 'productIndex'));
-
-    const productsList = config.productsList;
+    const productIndex = useSelector(selector);
   
     const onProductChange = (event) => {
       const index = event.target.value;
-      dispatch(changeProductIndex(index));
+      dispatch(actionCreator(index));
     };
   
     return (
@@ -26,3 +23,9 @@ export const ProductSelect = () => {
         value={productIndex} onChange={onProductChange} options={productsList} />
     );
   };
+
+ProductSelect.propTypes = {
+  selector: PropTypes.func.isRequired,
+  actionCreator: PropTypes.func.isRequired,
+  productsList: PropTypes.array.isRequired
+};

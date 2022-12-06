@@ -26,6 +26,8 @@ import nemacLogoWhite from '../nemac_logo_white.png';
 import nemacLogoBlack from '../nemac_logo_black.png';
 import { useStateWithLabel } from '../utils';
 import { AnimationTimeSelect } from './AnimationTimeSelect';
+import { selectLayerProperty, changeProductIndex, changeOverlayIndex } from '../reducers/layersSlice';
+import config from '../config';
 
 export const NavigationBar = ({
   map, animating, setAnimating, animationTime, setAnimationTime 
@@ -44,7 +46,10 @@ export const NavigationBar = ({
           <img src={ darkMode ? nemacLogoWhite : nemacLogoBlack} width="150" alt="your mom"></img>
           <BasemapSelect />
           <DateRangePicker />
-          <ProductSelect />
+          <ProductSelect selector={state => selectLayerProperty(state, 'productIndex')} actionCreator={changeProductIndex}
+            productsList={config.productsList} />
+          <ProductSelect selector={state => selectLayerProperty(state, 'overlayIndex')} actionCreator={changeOverlayIndex} 
+            productsList={config.overlaysList} />
           <ThemeSelect setDarkMode={setDarkMode} />
           <AnimateButton animating={animating} setAnimating={setAnimating} />
           <AnimationTimeSelect animationTime={animationTime} setAnimationTime={setAnimationTime} />

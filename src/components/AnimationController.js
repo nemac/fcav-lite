@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMap } from 'react-leaflet/hooks';
 import PropTypes from 'prop-types';
-//import 'leaflet-spin';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLayerProperty, changeDateRangeIndex, incrementDateRangeIndex } from '../reducers/layersSlice';
 
@@ -16,6 +15,7 @@ export const AnimationController = ({
   const loadingCheckInterval = 50; // interval in milliseconds
   const map = useMap();
   const [loaded, setLoaded] = useState(false);
+  const [spinning, setSpinning] = useState(false);
 
   // Helper function to check if all layers have been loaded
   const allLayersLoaded = () => {
@@ -38,7 +38,12 @@ export const AnimationController = ({
   useEffect(() => {
     if (!animating) {
       setLoaded(false);
-      map.fire('dataload');
+
+      if (spinning) {
+        map.spin(false);
+      }
+
+      setSpinning(false);
       return;
     }
 
@@ -49,17 +54,27 @@ export const AnimationController = ({
 
     if (!layersLoaded) {
       console.log("Setting spin to true");
-      map.fire('dataloading');
       map.eachLayer(layer => layer.on('load', allLayersLoaded));
+      
+      if (!spinning) {
+        map.spin(true);
+      }
+
+      setSpinning(true);
       return;
     }
 
-    map.fire('dataload');
+    if (spinning) {
+      map.spin(false);
+    }
+
+    setSpinning(false);
+
     console.log('Updating frame.');
 
     const timer = setTimeout(() => {
       if (allLayersLoaded()) {
-        if (dateRangeIndex === Object.keys(layers).length - 1) {
+        if (dateRangeIndex === layers.length - 1) {
           dispatch(changeDateRangeIndex(0));
         } else {
           dispatch(incrementDateRangeIndex());

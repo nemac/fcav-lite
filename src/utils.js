@@ -30,19 +30,34 @@ const usePrevious = value => {
 
 // Return a dictionary of layer objects indexed by URL WITHOUT the leaflet layer classes
 export const getWmsLayerObjects = (startDate, endDate, productIndex) => {
-  const wmsLayers = {};
+  const wmsLayers = [];
   let tempDate = getNextFWDate(startDate);
 
   while (tempDate <= endDate) {
     const wmsDate = toWMSDate(tempDate);
     const layerObject = config.wms_template(wmsDate, productIndex);
-    wmsLayers[layerObject.baseUrl + '/' + layerObject.options.layers] = layerObject;
+    layerObject.url = layerObject.baseUrl + '/' + layerObject.options.layers;
+    wmsLayers.push(layerObject);
+    tempDate.setDate(tempDate.getDate() + 1);
+    tempDate = getNextFWDate(tempDate);
+  }
+  
+  return wmsLayers;
+}
+
+export const getOverlayLayerObjects = (startDate, endDate, productIndex) => {
+  const overlayLayers = [];
+  let tempDate = getNextFWDate(startDate);
+
+  while (tempDate <= endDate) {
+    const layerObject = config.overlay_template(String(tempDate.getFullYear()), productIndex);
+    layerObject.url = layerObject.baseUrl + '/' + layerObject.options.layers;
+    overlayLayers.push(layerObject);
     tempDate.setDate(tempDate.getDate() + 1);
     tempDate = getNextFWDate(tempDate);
   }
 
-  console.log(wmsLayers);
-  return wmsLayers;
+  return overlayLayers;
 }
 
 export const getLeafletLayer = wmsLayerObject => L.tileLayer.wms(wmsLayerObject.baseUrl, wmsLayerObject.options);
