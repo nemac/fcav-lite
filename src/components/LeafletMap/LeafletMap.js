@@ -30,6 +30,8 @@ import { OfflineBolt } from '@material-ui/icons';
 import { ProductIndicator } from '../ProductIndicator';
 import config from '../../config';
 import { SVGOverlay } from 'react-leaflet';
+import { MapLegend } from '../MapLegend';
+import Control from 'react-leaflet-custom-control';
 
 // This API Key is used to access ArcGIS Online location services
 const apiKey = 'AAPK193b1a907b48469f98a0d22c7e27c57d_8CPajLDlUjQfkzjt4nWhAM0cjYe_8sRYBBnG0_iVP74XPYKqbQU3uhduKsl_pBs';
@@ -327,14 +329,14 @@ const MapController = ({
 
   if (isInitialRender) { // check if initilization is complete so we don't reinitilize components
     search.addTo(map);
-    const legend = L.control({ position: 'bottomright' });
-    legend.onAdd = () => {
-      const div = L.DomUtil.create('div', 'info legend');
-      div.innerHTML =
-                `<img src=${forwarn2Legend}` + ' width="128.5px" height="210.5px">';
-      return div;
-    };
-    legend.addTo(map);
+    // const legend = L.control({ position: 'bottomright' });
+    // legend.onAdd = () => {
+    //   // const div = L.DomUtil.create('div', 'info legend');
+    //   // div.innerHTML =
+    //   //           `<img src=${forwarn2Legend}` + ' margin-right="20%" width="128.5px" height="210.5px">';
+    //   // return div;
+    // };
+    // legend.addTo(map);
 
     // create loading indicator
     const leafletLoading = L.Control.loading({
@@ -434,16 +436,13 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
                       display: 'flex'
                     }}
                 >
+                    <Control position='bottomright'>
+                      <MapLegend />
+                    </Control>
                     <MapController currentGraphCoords={currentGraphCoords} setMap={setMap} modisData={modisData}
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
                                    setModisDataConfig={setModisDataConfig} />
                     <AnimationController animating={animating} animationTime={animationTime} />
-                    <SVGOverlay bounds={[[-100, -100], [100, 100]]}>
-                      <rect x='0' y='0' width='100%' height='100%' fill='red'/>
-                      <text x='50%' y='50%' stroke='black'>
-                        Blah blah blah
-                      </text>
-                    </SVGOverlay>
                       {/* <ProductIndicator selector={state => selectLayerProperty(state, 'productIndex')} productsList={config.productsList} />
                       <ProductIndicator selector={state => selectLayerProperty(state, 'overlayIndex')} productsList={config.overlaysList} />  */}
                 </MapContainer>
