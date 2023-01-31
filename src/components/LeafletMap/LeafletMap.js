@@ -438,8 +438,8 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
                                    setModisDataConfig={setModisDataConfig} />
                     <AnimationController animating={animating} animationTime={animationTime} />
-                    <SVGOverlay bounds={[[51.49, -0.08], [51.5, -0.06]]}>
-                      <rect x='0' y='0' width='100%' height='100% fill='white />
+                    <SVGOverlay bounds={[[-100, -100], [100, 100]]}>
+                      <rect x='0' y='0' width='100%' height='100%' fill='red'/>
                       <text x='50%' y='50%' stroke='black'>
                         Blah blah blah
                       </text>
