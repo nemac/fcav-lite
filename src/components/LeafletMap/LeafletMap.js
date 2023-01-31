@@ -438,13 +438,15 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
                 >
                     <Control position='bottomright'>
                       <MapLegend />
+                      <ProductIndicator selector={state => selectLayerProperty(state, 'overlayIndex')} productsList={config.overlaysList} />
                     </Control>
                     <MapController currentGraphCoords={currentGraphCoords} setMap={setMap} modisData={modisData}
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
                                    setModisDataConfig={setModisDataConfig} />
                     <AnimationController animating={animating} animationTime={animationTime} />
-                      {/* <ProductIndicator selector={state => selectLayerProperty(state, 'productIndex')} productsList={config.productsList} />
-                      <ProductIndicator selector={state => selectLayerProperty(state, 'overlayIndex')} productsList={config.overlaysList} />  */}
+                    <Control position='bottomleft'>
+                      <ProductIndicator selector={state => selectLayerProperty(state, 'productIndex')} productsList={config.productsList} />
+                    </Control>
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph modisData={modisData} modisDataConfig={modisDataConfig} />
