@@ -28,6 +28,7 @@ import { useStateWithLabel } from '../utils';
 import { AnimationTimeSelect } from './AnimationTimeSelect';
 import { selectLayerProperty, changeProductIndex, changeOverlayIndex } from '../reducers/layersSlice';
 import config from '../config';
+import { ProductIndicator } from './ProductIndicator';
 
 export const NavigationBar = ({
   map, animating, setAnimating, animationTime, setAnimationTime 

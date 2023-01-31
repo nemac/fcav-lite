@@ -7,7 +7,7 @@ const config = {
       {
         baseUrl: 'https://fswms.nemac.org/forwarn_compare',
         options: {
-          layers: `FW_${datestring}_1YR_FW2`,
+          layers: `FW_${datestring}_1YR_FW2MaskForForest`,
           format: 'image/png',
           transparent: true,
           tileSize: 2048,
@@ -19,7 +19,7 @@ const config = {
       {
         baseUrl: 'https://fswms.nemac.org/forwarn_compare',
         options: {
-          layers: `FW_${datestring}_ALC_FW2`,
+          layers: `FW_${datestring}_ALC_FW2MaskForForest`,
           format: 'image/png',
           transparent: true,
           tileSize: 2048,
@@ -31,7 +31,7 @@ const config = {
       {
         baseUrl: 'https://fswms.nemac.org/forwarn_compare',
         options: {
-          layers: `FW_${datestring}_3YR_FW2`,
+          layers: `FW_${datestring}_3YR_FW2MaskForForest`,
           format: 'image/png',
           transparent: true,
           tileSize: 2048,
@@ -43,7 +43,7 @@ const config = {
       {
         baseUrl: 'https://fswms.nemac.org/forwarn_compare',
         options: {
-          layers: `FW_${datestring}_5YR_FW2`,
+          layers: `FW_${datestring}_5YR_FW2MaskForForest`,
           format: 'image/png',
           transparent: true,
           tileSize: 2048,
@@ -55,7 +55,7 @@ const config = {
       {
         baseUrl: 'https://fswms.nemac.org/forwarn_compare',
         options: {
-          layers: `FW_${datestring}_MEDIAN_ALL_YEAR_FW2`,
+          layers: `FW_${datestring}_MEDIAN_ALL_YEAR_FW2MaskForForest`,
           format: 'image/png',
           transparent: true,
           tileSize: 2048,

@@ -27,6 +27,9 @@ import { selectGraphOn } from '../../reducers/graphSlice';
 import { selectBasemaps, selectBasemapIndex } from '../../reducers/basemapsSlice';
 import './LeafletMap.css';
 import { OfflineBolt } from '@material-ui/icons';
+import { ProductIndicator } from '../ProductIndicator';
+import config from '../../config';
+import { SVGOverlay } from 'react-leaflet';
 
 // This API Key is used to access ArcGIS Online location services
 const apiKey = 'AAPK193b1a907b48469f98a0d22c7e27c57d_8CPajLDlUjQfkzjt4nWhAM0cjYe_8sRYBBnG0_iVP74XPYKqbQU3uhduKsl_pBs';
@@ -412,8 +415,8 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
   }, 'MODIS CHART CONFIG');
 
   return (
-        <div>
-            <Grid item xs={12}>
+        <div style={{position: 'relative'}}>
+            <Grid item xs={12}>   
                 <MapContainer
                     className='mapContainer'
                     loadingControl={true}
@@ -435,6 +438,14 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
                                    setModisDataConfig={setModisDataConfig} />
                     <AnimationController animating={animating} animationTime={animationTime} />
+                    <SVGOverlay bounds={[[51.49, -0.08][51.5, -0.06]]}>
+                      <rect x='0' y='0' width='100%' height='100% fill='white />
+                      <text x='50%' y='50%' stroke='black'>
+                        Blah blah blah
+                      </text>
+                    </SVGOverlay>
+                      {/* <ProductIndicator selector={state => selectLayerProperty(state, 'productIndex')} productsList={config.productsList} />
+                      <ProductIndicator selector={state => selectLayerProperty(state, 'overlayIndex')} productsList={config.overlaysList} />  */}
                 </MapContainer>
             </Grid>
             <NDVIMultiYearGraph modisData={modisData} modisDataConfig={modisDataConfig} />
