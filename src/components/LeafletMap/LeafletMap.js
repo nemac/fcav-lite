@@ -32,6 +32,7 @@ import config from '../../config';
 import { SVGOverlay } from 'react-leaflet';
 import { MapLegend } from '../MapLegend';
 import Control from 'react-leaflet-custom-control';
+import Box from '@mui/material/Box';
 
 // This API Key is used to access ArcGIS Online location services
 const apiKey = 'AAPK193b1a907b48469f98a0d22c7e27c57d_8CPajLDlUjQfkzjt4nWhAM0cjYe_8sRYBBnG0_iVP74XPYKqbQU3uhduKsl_pBs';
@@ -421,6 +422,7 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
             <Grid item xs={12}>   
                 <MapContainer
                     className='mapContainer'
+                    attributionControl={false}
                     loadingControl={true}
                     whenCreated={(map) => {
                       map.on('click', (e) => {
@@ -437,8 +439,12 @@ export const LeafletMap = ({setMap, animating, animationTime}) => {
                     }}
                 >
                     <Control position='bottomright'>
+                      <Box sx={{ color: 'red' }}>
+                        <ProductIndicator selector={state => selectLayerProperty(state, 'overlayIndex')} productsList={config.overlaysList} />
+                      </Box>
+                    </Control>
+                    <Control position='topright'>
                       <MapLegend />
-                      <ProductIndicator selector={state => selectLayerProperty(state, 'overlayIndex')} productsList={config.overlaysList} />
                     </Control>
                     <MapController currentGraphCoords={currentGraphCoords} setMap={setMap} modisData={modisData}
                                    setModisData={setModisData} modisDataConfig={modisDataConfig}
