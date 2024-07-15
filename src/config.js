@@ -15,6 +15,11 @@ export const config = {
   yearMonthDay: `${year}${month}${day}`, // current year, month, and day
   leapYear: isLeapYear(year), // checks if leap year
   dateStart: '0103',
+  playSpeeds: { // in milliseconds
+    '1x': 2500,
+    '2x': 1250,
+    '4x': 625,
+  },
   nonLeapYearDays: [
     '0108',
     '0116',
@@ -124,6 +129,5 @@ export const config = {
       dayStart:'0108',
       yearStart: '2021'
     }
-
   ]
 }

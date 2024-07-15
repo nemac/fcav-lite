@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { MapContainer, WMSTileLayer } from "react-leaflet";
-import L from "leaflet";
 import { styled } from "@mui/system";
-import BaseMap from "./BaseMap";
 import { config } from "../config";
 import VectorBasemapLayer from "react-esri-leaflet/plugins/VectorBasemapLayer";
 
@@ -11,7 +9,7 @@ export const StyledMapContainer = styled(MapContainer)(({ theme }) => ({
 }));
 
 export default function ReactLeafletMap(props) {
-  const { selectedLayer } = props;
+  const { changeProduct } = props;
 
   return (
     <StyledMapContainer
@@ -26,11 +24,11 @@ export default function ReactLeafletMap(props) {
         rel="stylesheet"
         href="https://unpkg.com/esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css"
       />
-      {selectedLayer && (
+      {changeProduct && (
         <WMSTileLayer
-          key={selectedLayer.layer}
-          url={selectedLayer.url}
-          layers={selectedLayer.layer}
+          key={changeProduct.layer}
+          url={changeProduct.url}
+          layers={changeProduct.layer}
           format="image/png"
           transparent={true}
           uppercase={true}

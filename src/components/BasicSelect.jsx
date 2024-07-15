@@ -7,12 +7,12 @@ import Select from '@mui/material/Select';
 import { config } from '../config';
 
 export default function BasicSelect(props) {
-  const { selectedLayer, setSelectedLayer } = props;
+  const { label, selectedDate, changeProduct, setChangeProduct } = props;
 
   const handleChange = (event) => {
-    layer = event.target.value;
-    layer.layer = layer.layer.concat('currentMaskForForest');
-    setSelectedLayer(layer);
+    const layer = event.target.value;
+    layer.layer = layer.layer.concat(selectedDate).concat('MaskForForest');
+    setChangeProduct(layer);
   };
 
   return (
@@ -22,8 +22,8 @@ export default function BasicSelect(props) {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={selectedLayer}
-          label="Layer"
+          value={changeProduct}
+          label={label}
           onChange={handleChange}
         >
           {config.wmsLayers.map((layer, index) => (
