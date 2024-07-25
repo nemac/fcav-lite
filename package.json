@@ -17,6 +17,7 @@
     "@mui/material": "^5.15.11",
     "@mui/system": "^5.15.11",
     "@mui/x-date-pickers": "^6.19.6",
+    "@tanstack/react-query": "^5.51.11",
     "dayjs": "^1.11.10",
     "esri-leaflet": "^3.0.12",
     "esri-leaflet-vector": "^4.2.3",
@@ -27,7 +28,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-esri-leaflet": "^2.0.1",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "react-xml-parser": "^1.1.8"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",

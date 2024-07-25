@@ -4,16 +4,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import {
+  useQuery,
+} from '@tanstack/react-query'
+import XMLParser from 'react-xml-parser';
 import { config } from '../config';
 
 export default function BasicSelect(props) {
-  const { label, selectedDate, changeProduct, setChangeProduct } = props;
-
-  const handleChange = (event) => {
-    const layer = event.target.value;
-    layer.layer = layer.layer.concat(selectedDate).concat('MaskForForest');
-    setChangeProduct(layer);
-  };
+  const { label, selection, selectionList, handleChange } = props;
 
   return (
     <Box sx={{ minWidth: 120 }}>
@@ -22,11 +20,11 @@ export default function BasicSelect(props) {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={changeProduct}
+          value={selection}
           label={label}
           onChange={handleChange}
         >
-          {config.wmsLayers.map((layer, index) => (
+          {selectionList.map((layer, index) => (
             <MenuItem key={index} value={layer}>
               {layer.name}
             </MenuItem>
