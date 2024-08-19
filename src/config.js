@@ -1,10 +1,8 @@
-// const wmsUrl = 'http://load-balancer-dev-947115727.us-east-1.elb.amazonaws.com/?map=/etc/mapserver/ecs_test_map_files/mapserver.map';
-const wmsUrl = 'http://d350ofm3f3y3zj.cloudfront.net/?map=/etc/mapserver/ecs_test_map_files/';
-const wmsUrlFull = 'http://d350ofm3f3y3zj.cloudfront.net/?map=/etc/mapserver/ecs_test_map_files/mapserver.map';
+const wmsUrl = 'https://mapserver.nemac.org/?map=/etc/mapserver/ecs_test_map_files/';
+const wmsUrlFull = 'https://mapserver.nemac.org/?map=/etc/mapserver/ecs_test_map_files/mapserver.map';
 export const config = {
   wmsUrl: wmsUrl,
   wmsUrlFull: wmsUrlFull,
-  // const wmsUrl = wmsBaseUrl.concat('?map=/etc/mapserver/ecs_test_map_files/mapserver.map')
   agolApiKey: 'AAPK961d021a9f344f7c95eaadbeb6c6f39ajXC7QTZMufrPPCzqo0NN_ta6FKKzOb8GDutDr1ipDWZMVMPT-Mgy4CNcnKIXJTdu',
   mapCenter: [26.9517, -82.4588],
   mapZoom: 7,
