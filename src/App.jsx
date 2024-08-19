@@ -206,7 +206,7 @@ function App() {
           handleChange={handleBasemapChange}
         />
       </Grid>
-      <Grid xs={12} lg={3}>
+      <Grid xs={12} lg={2}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             value={startDate}
@@ -227,7 +227,7 @@ function App() {
           max={availableLayers.length - 1}
         />
       </Grid>
-      <Grid xs={12} lg={3}>
+      <Grid xs={12} lg={2}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
               value={endDate}
