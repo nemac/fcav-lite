@@ -11,24 +11,34 @@ import XMLParser from 'react-xml-parser';
 import { config } from '../config';
 
 export default function BasicSelect(props) {
-  const { label, selection, selectionList, handleChange } = props;
 
+  const {
+    defaultValue,
+    value,
+    label,
+    selectionList,
+    handleChange
+  } = props
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Select Layer</InputLabel>
+        <InputLabel id="demo-simple-select-label">
+          {label}
+        </InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={selection}
           label={label}
+          defaultValue={defaultValue}
+          value={value}
           onChange={handleChange}
+          variant="outlined"
         >
-          {selectionList.map((layer, index) => (
-            <MenuItem key={index} value={layer}>
-              {layer.name}
+          {selectionList.map((item) =>
+            <MenuItem key={item} value={item}>
+              {item}
             </MenuItem>
-          ))}
+          )}
         </Select>
       </FormControl>
     </Box>
