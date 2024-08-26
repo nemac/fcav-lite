@@ -1,0 +1,38 @@
+  LAYER
+    NAME "{layer_name}"
+    PROJECTION
+      "+proj=laea"
+      "+lat_0=45"
+      "+lon_0=-100"
+      "+x_0=0"
+      "+y_0=0"
+      "+a=6370997"
+      "+b=6370997"
+      "+units=m"
+      "+no_defs"
+    END # END PROJECTION
+    TYPE RASTER
+    STATUS   OFF
+    VALIDATION
+      "mask" "^[a-zA-Z0-9_]+$"
+      "default_mask" "empty_mask"
+    END # END VALIDATION
+    DATA {data_location}
+    TEMPLATE layer_query_body.html # THIS DOES NOT EXIST AT THE MOMENT BUT IT IS NEEDED TO HAVE queryable=1
+    #GROUP "{group_name}"
+    INCLUDE "new-forwarn2-standard-2.cmap"
+    METADATA
+      "wms_title"             "{metadata_name}"
+      #"wms_group_title"       "{group_name}"
+      "wms_extent"            "-2401951.937575, -2238222.70389, 2345858.525679, 967021.455769"
+      "wms_abstract"          "{metadata_name}"
+      "wcs_label"             "{metadata_name}"
+      "wcs_rangeset_name"     "{metadata_name}"
+      "wcs_rangeset_label"    "{metadata_name}"
+      "wcs_bandcount"         "1"
+      "wcs_formats"           "GEOTIFF"
+      "wcs_nativeformat"      "8-bit GeoTIF"
+      "gml_include_items"     "value_0"
+    END  # end METADATA
+    MASK '%mask%'
+  END # end LAYER

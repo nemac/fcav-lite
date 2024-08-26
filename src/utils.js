@@ -25,9 +25,21 @@ export function calculateCenterAndZoom(extent) {
     return { center: [center.lat, center.lng], zoom };
 }
 
-export const convertStringToDate = (dateString) => {
+export function convertStringToDate(dateString) {
     const year = dateString.slice(0, 4);
     const month = dateString.slice(4, 6);
     const day = dateString.slice(6, 8);
     return new Date(`${year}-${month}-${day}T00:00:00-04:00`);
 };
+
+// parses "2024-06-26_2024-07-19.napolygon.1yrdeparture.LAEA.img" into "20240719
+export function parseDateString(inputString) {
+    // Split the string by underscore and period
+    const parts = inputString.split('_')[1].split('.');
+
+    // Extract the date part (2024-07-19)
+    const datePart = parts[0];
+
+    // Remove hyphens and return only the digits
+    return datePart.replace(/-/g, '');
+}

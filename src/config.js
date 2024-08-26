@@ -18,9 +18,14 @@ export const config = {
       url: wmsUrl.concat('forwarn3_products_1yr.map'),
       layer_regex: /^forwarn3_products_1yr_(\d{4})(\d{2})(\d{2})$/
     },
+    'forwarn3_products_1yr': {
+      name: 'forwarn3_products_1yr',
+      url: wmsUrl.concat('test_runtime_sub.map'),
+      layer_regex: /^forwarn3_products_1yr_(\d{4})(\d{2})(\d{2})$/
+    },
     'FW3 2 year Early Detect': {
       name: 'FW3 2 year Early Detect',
-      url: wmsUrlFull,
+      url: wmsUrl,
       layer_regex: /^forwarn3_products_2yrED_(\d{4})(\d{2})(\d{2})$/
     },
     'FW3 2 year Early Early Detect': {
@@ -129,6 +134,11 @@ export const config = {
       name: 'Tropical Cyclone Lines 2023',
       url: wmsUrl.concat('vlayers.map'),
       layerName: 'tropical_cyclone_lines_2023'
+    },
+    'Tropical Cyclone Lines Since 1980': {
+      name: 'Tropical Cyclone Lines Since 1980',
+      url: wmsUrl.concat('vector_map_files/tropical_cyclone_lines.map'),
+      layerName: 'tropical_cyclone_lines_since_1980'
     }
   },
   masks: {

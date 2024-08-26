@@ -1,15 +1,15 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { MapContainer, WMSTileLayer } from "react-leaflet";
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import { MapContainer, useMapEvents, WMSTileLayer } from "react-leaflet";
 import Slider from '@mui/material/Slider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import {IconButton} from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 import styled from "@emotion/styled";
 import {
   useQuery,
@@ -23,24 +23,25 @@ import BasicButton from './components/BasicButton';
 import BasicDatePicker from './components/BasicDatePicker';
 import DateSlider from './components/DateSlider';
 import { config } from './config';
-import { webMercatorToLatLng, convertStringToDate } from "./utils.js";
+import {webMercatorToLatLng, convertStringToDate, parseDateString} from "./utils.js";
 import BasicText from "./components/BasicText.jsx";
 
 export const StyledMapContainer = styled(MapContainer)(() => ({
   height: '100%',
-  width: '100%'
+  width: '100%',
 }));
 
 function App() {
+  const [map, setMap] = React.useState(null)
   const [changeProduct, setChangeProduct] = React.useState(config.wmsLayers['FW3 1 year']);
   const [mask, setMask] = React.useState(config.masks['MaskForForest']);
-  const [overlay, setOverlay] = React.useState(config.vectorLayers['Tropical Cyclone Lines 2022']);
+  const [overlay, setOverlay] = React.useState(config.vectorLayers['Tropical Cyclone Lines Since 1980']);
   const [basemap, setBasemap] = React.useState(config.basemaps['ArcGIS Imagery']);
   const [availableLayers, setAvailableLayers] = React.useState([]);
   const [activeLayerIndex, setActiveLayerIndex] = React.useState(0);
   const [rasterOpacity, setRasterOpacity] = React.useState(75);
   const [startDate, setStartDate] = React.useState(dayjs('2024-07-01'));
-  const [endDate, setEndDate] = React.useState(dayjs('2024-07-31'));
+  const [endDate, setEndDate] = React.useState(dayjs('2024-07-08'));
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [playSpeed, setPlaySpeed] = React.useState(config.playSpeeds['2x']);
   const [unFilteredLayers, setUnfilteredLayers] = React.useState([]);
@@ -87,8 +88,8 @@ function App() {
   };
 
   const handleMaskChange = (event) => {
-    const selectedMask = config.masks(event.target.value);
-    setMask(selectedMask);
+    const selectedMask = event.target.value;
+    setMask(config.masks[selectedMask]);
   }
 
   const handleOverlayChange = (event) => {
@@ -99,6 +100,36 @@ function App() {
   const handleBasemapChange = (event) => {
     const selectedBasemap = event.target.value;
     setBasemap(config.basemaps[selectedBasemap]);
+  }
+
+  const NdviChartButton = () => {
+    const map = useMapEvents({
+      click() {
+        if(map.getContainer().style.cursor === 'crosshair') {
+          console.log('map click for graph')
+          map.getContainer().style.cursor = 'grab'
+        }
+      }
+    })
+    const chartOnClick = (event) => {
+      event.stopPropagation();
+      if(map.getContainer().style.cursor === 'grab') {
+        map.getContainer().style.cursor = 'crosshair';
+        return
+      }
+      map.getContainer().style.cursor = 'grab';
+    }
+
+    return (
+      <IconButton
+        sx={{'background-color':'white', zIndex: 1000}}
+        variant='contained'
+        size='medium'
+        onClick={(event) => chartOnClick(event)}
+      >
+        <ShowChartIcon/>
+      </IconButton>
+    )
   }
 
   const handleIsPlayingPress = (event) => {
@@ -135,7 +166,6 @@ function App() {
   // Update available layers when the getCapabilities query has returned
   React.useEffect(() => {
     if (!data) return;
-    // const layerName = event.target.value;
     const layers = data?.getElementsByTagName('Layer');
     const queryableLayers = layers.filter(layer => layer.attributes.queryable === "1");
     const availableLayers = [];
@@ -168,9 +198,10 @@ function App() {
   const northEast = webMercatorToLatLng(maxX, maxY);
   const southEast = webMercatorToLatLng(maxX, minY);
 
-// Calculate the center
+  // Calculate the center
   const centerLat = (southWest[0] + northWest[0] + northEast[0] + southEast[0]) / 4;
   const centerLng = (southWest[1] + northWest[1] + northEast[1] + southEast[1]) / 4;
+
 
   return (
     <Grid container spacing={2} p={1}>
@@ -243,53 +274,69 @@ function App() {
           onClick={(event) => handleIsPlayingPress(event)}
         />
       </Grid>
-    <Grid xs={12} style={{height: '1000px', width: '100%'}}>
-      <StyledMapContainer
-        id='map-container'
-        center={config.mapCenter}
-        zoom={config.mapZoom}
-      >
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet@latest/dist/leaflet.css"
-        />
-        {availableLayers.map((layer, index) => (
+      <Grid xs={12} style={{height: '700px', width: '100%'}}>
+        <StyledMapContainer
+          id='map-container'
+          center={config.mapCenter}
+          zoom={config.mapZoom}
+          ref={setMap}
+        >
+          <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@latest/dist/leaflet.css"
+          />
+          {/*{availableLayers.map((layer, index) => (*/}
+          {/*  <WMSTileLayer*/}
+          {/*    key={layer + mask.name}*/}
+          {/*    url={changeProduct.url}*/}
+          {/*    layers={layer}*/}
+          {/*    format="image/png"*/}
+          {/*    transparent={true}*/}
+          {/*    uppercase={true}*/}
+          {/*    mask={mask.name}*/}
+          {/*    opacity={index === activeLayerIndex ? 1 : 0}*/}
+          {/*  />*/}
+          {/*))}*/}
           <WMSTileLayer
-            key={layer + mask}
+            key={availableLayers[activeLayerIndex] + mask}
             url={changeProduct.url}
-            layers={layer}
+            layers={availableLayers[activeLayerIndex]}
             format="image/png"
             transparent={true}
             uppercase={true}
             mask={mask.name}
-            opacity={index === activeLayerIndex ? 1 : 0}
           />
-        ))}
-        <WMSTileLayer
-          key={overlay.name}
-          url={overlay.url}
-          layers={overlay.layerName}
-          format="image/png"
-          transparent={true}
-          uppercase={true}
-        />
-        <div className='leaflet-bottom leaflet-left' style={{bottom: '10px', left: '20px'}}>
-          <div className="leaflet-control leaflet-bar">
-            <BasicText
-              text={availableLayers[activeLayerIndex]}
-            />
+          <WMSTileLayer
+            key={overlay.name}
+            url={overlay.url}
+            layers={overlay.layerName}
+            format="image/png"
+            transparent={true}
+            uppercase={true}
+            time={'2022-01-01 00:00:00/2023-12-31 00:00:00'}
+          />
+          <div className='leaflet-top leaflet-left' style={{top: '90px'}}>
+            <div className="leaflet-control leaflet-bar">
+              <NdviChartButton/>
+            </div>
           </div>
-        </div>
-        <div className='leaflet-bottom leaflet-right' style={{bottom: '10px', right: '20px'}}>
-          <div className="leaflet-control leaflet-bar">
-            <BasicText
-              text={overlay.name}
-            />
+          <div className='leaflet-bottom leaflet-left' style={{bottom: '10px', left: '20px'}}>
+            <div className="leaflet-control leaflet-bar">
+              <BasicText
+                text={availableLayers[activeLayerIndex]}
+              />
+            </div>
           </div>
-        </div>
-        <VectorBasemapLayer key={basemap.basemap} name={basemap.basemap} token={config.agolApiKey}/>
-      </StyledMapContainer>
-    </Grid>
+          <div className='leaflet-bottom leaflet-right' style={{bottom: '10px', right: '20px'}}>
+            <div className="leaflet-control leaflet-bar">
+              <BasicText
+                text={overlay.name}
+              />
+            </div>
+          </div>
+          <VectorBasemapLayer key={basemap.basemap} name={basemap.basemap} token={config.agolApiKey}/>
+        </StyledMapContainer>
+      </Grid>
     </Grid>
   )
 }
