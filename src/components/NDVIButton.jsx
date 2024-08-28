@@ -50,9 +50,10 @@ export default function NDVIButtonWrapper(props) {
       const response = await fetch(`${ndviEndpoint}?lat=${popupPosition[0]}&lng=${popupPosition[1]}`);
       return await response.json();
     },
+    enabled: !!popupPosition,
   });
 
-  if (isPending) console.log('isPending');
+  if (isPending) console.log('NDVI Pending');
   if (error) return 'An error has occurred: ' + error.message;
 
   React.useEffect(() => {
