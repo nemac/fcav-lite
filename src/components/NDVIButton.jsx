@@ -6,7 +6,7 @@ import { useMap } from 'react-leaflet';
 import { Button } from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { useQuery } from '@tanstack/react-query';
-import { convertStringToDate } from '../utils.js';
+import {convertDateToString, convertStringToDate} from '../utils.js';
 
 const createNdviButtonControl = (props) => {
   const { handler } = props;
@@ -39,7 +39,7 @@ const createNdviButtonControl = (props) => {
 const NDVIButton = createControlComponent(createNdviButtonControl);
 
 export default function NDVIButtonWrapper(props) {
-  const { popupPosition, setPopupPosition, setShowGraph, setNdviData } = props;
+  const { popupPosition, startDate, endDate, setPopupPosition, setShowGraph, setNdviData, setNdviDataSubset } = props;
   // TODO: Change this to actual ForWarn data and not LanDAT
   const ndviEndpoint = 'https://4desh2uig8.execute-api.us-east-1.amazonaws.com/prod/landat-ndvi';
   const map = useMap();
@@ -67,7 +67,12 @@ export default function NDVIButtonWrapper(props) {
       };
     });
     setNdviData(ndviData);
-    console.log(ndviData);
+    setNdviDataSubset(
+      ndviData.filter(item => {
+        const date = convertStringToDate(item.name);
+        return (date >= startDate && date <= endDate);
+      })
+    )
   }, [data]);
 
   const ndviClickHandler = (e) => {

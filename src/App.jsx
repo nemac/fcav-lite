@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { Marker, MapContainer, Popup, useMap, useMapEvents, WMSTileLayer } from 'react-leaflet';
 import { Box, Paper, Slider } from '@mui/material';
@@ -10,6 +10,7 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import CloseIcon from '@mui/icons-material/Close';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 import styled from '@emotion/styled';
 import { useQuery } from '@tanstack/react-query';
 import XMLParser from 'react-xml-parser';
@@ -20,10 +21,8 @@ import BasicSelect from './components/BasicSelect';
 import BasicButton from './components/BasicButton';
 import BasicText from './components/BasicText.jsx';
 import NDVIChart from './components/NDVIChart.jsx';
-import BasicDatePicker from './components/BasicDatePicker';
-import DateSlider from './components/DateSlider';
 import { config } from './config';
-import { webMercatorToLatLng, convertStringToDate, parseDateString } from './utils.js';
+import { webMercatorToLatLng, convertStringToDate, parseDateString, convertDateToString } from './utils.js';
 import NDVIButtonWrapper from './components/NDVIButton.jsx';
 
 export const StyledMapContainer = styled(MapContainer)(() => ({
@@ -32,21 +31,22 @@ export const StyledMapContainer = styled(MapContainer)(() => ({
 }));
 
 function App() {
-  const [map, setMap] = React.useState(null);
-  const [ndviData, setNdviData] = React.useState([]);
-  const [showGraph, setShowGraph] = React.useState(false);
-  const [popupPosition, setPopupPosition] = React.useState(null);
-  const [changeProduct, setChangeProduct] = React.useState(config.wmsLayers['FW3 1 year']);
-  const [mask, setMask] = React.useState(config.masks['MaskForForest']);
-  const [overlay, setOverlay] = React.useState(config.vectorLayers['Tropical Cyclone Lines Since 1980']);
-  const [basemap, setBasemap] = React.useState(config.basemaps['ArcGIS Imagery']);
-  const [availableLayers, setAvailableLayers] = React.useState([]);
-  const [activeLayerIndex, setActiveLayerIndex] = React.useState(0);
-  const [startDate, setStartDate] = React.useState(dayjs('2024-07-01'));
-  const [endDate, setEndDate] = React.useState(dayjs('2024-07-08'));
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [playSpeed, setPlaySpeed] = React.useState(config.playSpeeds['2x']);
-  const [unFilteredLayers, setUnfilteredLayers] = React.useState([]);
+  const [map, setMap] = useState(null);
+  const [ndviData, setNdviData] = useState([]);
+  const [ndviDataSubset, setNdviDataSubset] = useState([]);
+  const [showGraph, setShowGraph] = useState(false);
+  const [popupPosition, setPopupPosition] = useState(null);
+  const [changeProduct, setChangeProduct] = useState(config.wmsLayers['Net Ecological 3 Year']);
+  const [mask, setMask] = useState(config.masks['MaskForForest']);
+  const [overlay, setOverlay] = useState(config.vectorLayers['Tropical Cyclone Lines Since 1980']);
+  const [basemap, setBasemap] = useState(config.basemaps['ArcGIS Imagery']);
+  const [availableLayers, setAvailableLayers] = useState([]);
+  const [activeLayerIndex, setActiveLayerIndex] = useState(0);
+  const [startDate, setStartDate] = useState(dayjs('2017-01-01'));
+  const [endDate, setEndDate] = useState(dayjs('2018-01-01'));
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playSpeed, setPlaySpeed] = useState(config.playSpeeds['2x']);
+  const [unFilteredLayers, setUnfilteredLayers] = useState([]);
   const intervalRef = React.useRef(null);
 
   const onSelectedDateChange = (event) => {
@@ -66,6 +66,14 @@ function App() {
       }
     });
     setAvailableLayers(allLayers);
+
+    // filter ndvi values
+    setNdviDataSubset(
+      ndviData.filter((item) => {
+        const date = convertStringToDate(item.name);
+        return date >= newStartDate && date <= endDate;
+      })
+    );
   };
 
   const endDateChanged = (event) => {
@@ -80,6 +88,14 @@ function App() {
       }
     });
     setAvailableLayers(allLayers);
+
+    // filter ndvi values
+    setNdviDataSubset(
+      ndviData.filter((item) => {
+        const date = convertStringToDate(item.name);
+        return date >= startDate && date <= newEndDate;
+      })
+    );
   };
 
   const handleChangeProductChange = (event) => {
@@ -165,11 +181,15 @@ function App() {
     enabled: !!changeProduct?.url,
   });
 
-  if (isPending) console.log('isPending');
-  if (error) return 'An error has occurred: ' + error.message;
+  if (isPending) {
+    console.log('isPending');
+  }
+  if (error) {
+    console.log('An error has occurred: ' + error.message);
+  }
 
   // Update available layers when the getCapabilities query has returned
-  React.useEffect(() => {
+  useEffect(() => {
     if (!data) return;
     const layers = data?.getElementsByTagName('Layer');
     const queryableLayers = layers.filter((layer) => layer.attributes.queryable === '1');
@@ -208,8 +228,16 @@ function App() {
   const centerLng = (southWest[1] + northWest[1] + northEast[1] + southEast[1]) / 4;
 
   return (
-    <Grid container spacing={2} p={1} sx={{ height: '100%' }}>
-      <Grid xs={12} lg={3}>
+    <Grid
+      container
+      spacing={2}
+      p={1}
+      sx={{ height: '100%' }}
+    >
+      <Grid
+        xs={12}
+        lg={3}
+      >
         <BasicSelect
           value={changeProduct.name}
           label={'Change Product'}
@@ -217,7 +245,10 @@ function App() {
           handleChange={handleChangeProductChange}
         />
       </Grid>
-      <Grid xs={12} lg={3}>
+      <Grid
+        xs={12}
+        lg={3}
+      >
         <BasicSelect
           value={mask.name}
           label={'Mask'}
@@ -225,7 +256,10 @@ function App() {
           handleChange={handleMaskChange}
         />
       </Grid>
-      <Grid xs={12} lg={3}>
+      <Grid
+        xs={12}
+        lg={3}
+      >
         <BasicSelect
           value={overlay.name}
           label={'Overlay'}
@@ -233,7 +267,10 @@ function App() {
           handleChange={handleOverlayChange}
         />
       </Grid>
-      <Grid xs={12} lg={3}>
+      <Grid
+        xs={12}
+        lg={3}
+      >
         <BasicSelect
           value={basemap.name}
           label={'Base Map'}
@@ -241,12 +278,22 @@ function App() {
           handleChange={handleBasemapChange}
         />
       </Grid>
-      <Grid xs={12} lg={2}>
+      <Grid
+        xs={12}
+        lg={2}
+      >
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker value={startDate} label="Start Date" onChange={(event) => startDateChanged(event)} />
+          <DatePicker
+            value={startDate}
+            label="Start Date"
+            onChange={(event) => startDateChanged(event)}
+          />
         </LocalizationProvider>
       </Grid>
-      <Grid xs={12} lg={5}>
+      <Grid
+        xs={12}
+        lg={5}
+      >
         <Slider
           aria-label="Date"
           // slots={{valueLabel: ValueLabelComponent}}
@@ -258,23 +305,44 @@ function App() {
           max={availableLayers.length - 1}
         />
       </Grid>
-      <Grid xs={12} lg={2}>
+      <Grid
+        xs={12}
+        lg={2}
+      >
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker value={endDate} label="End Date" onChange={(event) => endDateChanged(event)} />
+          <DatePicker
+            value={endDate}
+            label="End Date"
+            onChange={(event) => endDateChanged(event)}
+          />
         </LocalizationProvider>
       </Grid>
-      <Grid xs={12} lg={1}>
+      <Grid
+        xs={12}
+        lg={1}
+      >
         <BasicButton
           icon={isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
           label={isPlaying ? 'Pause' : 'Animate'}
           onClick={(event) => handleIsPlayingPress(event)}
         />
       </Grid>
-      <Grid xs={12} sx={{ height: '100%', width: '100%' }}>
+      <Grid
+        xs={12}
+        sx={{ height: '100%', width: '100%' }}
+      >
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ height: '100%', transition: 'flex 0.3s ease-in-out' }}>
-            <StyledMapContainer ref={setMap} id="map-container" center={config.mapCenter} zoom={config.mapZoom}>
-              <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
+            <StyledMapContainer
+              ref={setMap}
+              id="map-container"
+              center={config.mapCenter}
+              zoom={config.mapZoom}
+            >
+              <link
+                rel="stylesheet"
+                href="https://unpkg.com/leaflet@latest/dist/leaflet.css"
+              />
               {/*{availableLayers.map((layer, index) => (*/}
               {/*  <WMSTileLayer*/}
               {/*    key={layer + mask.name}*/}
@@ -287,55 +355,75 @@ function App() {
               {/*    opacity={index === activeLayerIndex ? 1 : 0}*/}
               {/*  />*/}
               {/*))}*/}
-              <WMSTileLayer
-                key={availableLayers[activeLayerIndex] + mask}
-                url={changeProduct.url}
-                layers={availableLayers[activeLayerIndex]}
-                format="image/png"
-                transparent={true}
-                uppercase={true}
-                mask={mask.name}
-              />
-              <WMSTileLayer
-                key={overlay.name}
-                url={overlay.url}
-                layers={overlay.layerName}
-                format="image/png"
-                transparent={true}
-                uppercase={true}
-                time={'2022-01-01 00:00:00/2023-12-31 00:00:00'}
-              />
+              {/*<WMSTileLayer*/}
+              {/*  key={availableLayers[activeLayerIndex] + mask}*/}
+              {/*  url={changeProduct.url}*/}
+              {/*  layers={availableLayers[activeLayerIndex]}*/}
+              {/*  format="image/png"*/}
+              {/*  transparent={true}*/}
+              {/*  uppercase={true}*/}
+              {/*  mask={mask.name}*/}
+              {/*/>*/}
+              {/*<WMSTileLayer*/}
+              {/*  key={overlay.name}*/}
+              {/*  url={overlay.url}*/}
+              {/*  layers={overlay.layerName}*/}
+              {/*  format="image/png"*/}
+              {/*  transparent={true}*/}
+              {/*  uppercase={true}*/}
+              {/*  time={'2022-01-01 00:00:00/2023-12-31 00:00:00'}*/}
+              {/*/>*/}
               {/*<div className="leaflet-top leaflet-left" style={{ top: '90px' }}>*/}
               {/*  <div className="leaflet-control leaflet-bar">*/}
               {/*    <NdviChartButton />*/}
               {/*  </div>*/}
               {/*</div>*/}
-              <div className="leaflet-bottom leaflet-left" style={{ bottom: '10px', left: '20px' }}>
+              <div
+                className="leaflet-bottom leaflet-left"
+                style={{ bottom: '10px', left: '20px' }}
+              >
                 <div className="leaflet-control leaflet-bar">
                   <BasicText text={availableLayers[activeLayerIndex]} />
                 </div>
               </div>
-              <div className="leaflet-bottom leaflet-right" style={{ bottom: '10px', right: '20px' }}>
+              <div
+                className="leaflet-bottom leaflet-right"
+                style={{ bottom: '10px', right: '20px' }}
+              >
                 <div className="leaflet-control leaflet-bar">
                   <BasicText text={overlay.name} />
                 </div>
               </div>
-              <VectorBasemapLayer key={basemap.basemap} name={basemap.basemap} token={config.agolApiKey} />
+              <VectorBasemapLayer
+                key={basemap.basemap}
+                name={basemap.basemap}
+                token={config.agolApiKey}
+              />
               <NDVIButtonWrapper
                 popupPosition={popupPosition}
+                startDate={startDate}
+                endDate={endDate}
                 setPopupPosition={setPopupPosition}
                 setShowGraph={setShowGraph}
                 setNdviData={setNdviData}
+                setNdviDataSubset={setNdviDataSubset}
               />
               {showGraph && <Marker position={popupPosition} />}
             </StyledMapContainer>
           </Box>
           {showGraph && (
             <Box sx={{ height: '100%', width: '100%', zIndex: 100 }}>
-              <Grid container spacing={2}>
-                <Grid>
-                  <NDVIChart ndviData={ndviData} />
-                </Grid>
+              <Grid
+                container
+                spacing={2}
+              >
+                {/*<Grid>*/}
+                {/*</Grid>*/}
+                <NDVIChart
+                  data={ndviDataSubset}
+                  activeLayerIndex={activeLayerIndex}
+                />
+
                 <Grid>
                   <IconButton
                     aria-label="close"
