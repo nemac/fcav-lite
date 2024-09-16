@@ -36,14 +36,14 @@ function App() {
   const [ndviDataSubset, setNdviDataSubset] = useState([]);
   const [showGraph, setShowGraph] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
-  const [changeProduct, setChangeProduct] = useState(config.wmsLayers['Net Ecological 3 Year']);
-  const [mask, setMask] = useState(config.masks['MaskForForest']);
-  const [overlay, setOverlay] = useState(config.vectorLayers['Tropical Cyclone Lines Since 1980']);
+  const [changeProduct, setChangeProduct] = useState(config.wmsLayers['FW3 1 year']);
+  const [mask, setMask] = useState(config.masks['NoMask']);
+  const [overlay, setOverlay] = useState(config.vectorLayers['modis-fire-2022']);
   const [basemap, setBasemap] = useState(config.basemaps['ArcGIS Imagery']);
   const [availableLayers, setAvailableLayers] = useState([]);
   const [activeLayerIndex, setActiveLayerIndex] = useState(0);
-  const [startDate, setStartDate] = useState(dayjs('2017-01-01'));
-  const [endDate, setEndDate] = useState(dayjs('2018-01-01'));
+  const [startDate, setStartDate] = useState(dayjs('2024-07-01'));
+  const [endDate, setEndDate] = useState(dayjs('2024-09-01'));
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(config.playSpeeds['2x']);
   const [unFilteredLayers, setUnfilteredLayers] = useState([]);
@@ -332,7 +332,7 @@ function App() {
         sx={{ height: '100%', width: '100%' }}
       >
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ height: '100%', transition: 'flex 0.3s ease-in-out' }}>
+          <Box sx={{ height: '80%', transition: 'flex 0.3s ease-in-out' }}>
             <StyledMapContainer
               ref={setMap}
               id="map-container"
@@ -343,18 +343,29 @@ function App() {
                 rel="stylesheet"
                 href="https://unpkg.com/leaflet@latest/dist/leaflet.css"
               />
-              {/*{availableLayers.map((layer, index) => (*/}
-              {/*  <WMSTileLayer*/}
-              {/*    key={layer + mask.name}*/}
-              {/*    url={changeProduct.url}*/}
-              {/*    layers={layer}*/}
-              {/*    format="image/png"*/}
-              {/*    transparent={true}*/}
-              {/*    uppercase={true}*/}
-              {/*    mask={mask.name}*/}
-              {/*    opacity={index === activeLayerIndex ? 1 : 0}*/}
-              {/*  />*/}
-              {/*))}*/}
+              <WMSTileLayer
+                key={overlay.name}
+                url={overlay.url}
+                layers={overlay.layerName}
+                format="image/png"
+                transparent={true}
+                uppercase={true}
+                opacity={100}
+                zIndex={100}
+                // time={'2022-01-01 00:00:00/2023-12-31 00:00:00'}
+              />
+              {availableLayers.map((layer, index) => (
+                <WMSTileLayer
+                  key={layer + mask.name}
+                  url={changeProduct.url}
+                  layers={layer}
+                  format="image/png"
+                  transparent={true}
+                  uppercase={true}
+                  mask={mask.name}
+                  opacity={index === activeLayerIndex ? 1 : 0}
+                />
+              ))}
               {/*<WMSTileLayer*/}
               {/*  key={availableLayers[activeLayerIndex] + mask}*/}
               {/*  url={changeProduct.url}*/}
@@ -363,15 +374,6 @@ function App() {
               {/*  transparent={true}*/}
               {/*  uppercase={true}*/}
               {/*  mask={mask.name}*/}
-              {/*/>*/}
-              {/*<WMSTileLayer*/}
-              {/*  key={overlay.name}*/}
-              {/*  url={overlay.url}*/}
-              {/*  layers={overlay.layerName}*/}
-              {/*  format="image/png"*/}
-              {/*  transparent={true}*/}
-              {/*  uppercase={true}*/}
-              {/*  time={'2022-01-01 00:00:00/2023-12-31 00:00:00'}*/}
               {/*/>*/}
               {/*<div className="leaflet-top leaflet-left" style={{ top: '90px' }}>*/}
               {/*  <div className="leaflet-control leaflet-bar">*/}
@@ -399,15 +401,15 @@ function App() {
                 name={basemap.basemap}
                 token={config.agolApiKey}
               />
-              <NDVIButtonWrapper
-                popupPosition={popupPosition}
-                startDate={startDate}
-                endDate={endDate}
-                setPopupPosition={setPopupPosition}
-                setShowGraph={setShowGraph}
-                setNdviData={setNdviData}
-                setNdviDataSubset={setNdviDataSubset}
-              />
+              {/*<NDVIButtonWrapper*/}
+              {/*  popupPosition={popupPosition}*/}
+              {/*  startDate={startDate}*/}
+              {/*  endDate={endDate}*/}
+              {/*  setPopupPosition={setPopupPosition}*/}
+              {/*  setShowGraph={setShowGraph}*/}
+              {/*  setNdviData={setNdviData}*/}
+              {/*  setNdviDataSubset={setNdviDataSubset}*/}
+              {/*/>*/}
               {showGraph && <Marker position={popupPosition} />}
             </StyledMapContainer>
           </Box>

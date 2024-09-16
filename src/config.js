@@ -1,11 +1,10 @@
-const wmsUrl = 'https://mapserver.nemac.org/?map=/etc/mapserver/ecs_test_map_files/';
-const wmsUrlFull = 'https://mapserver.nemac.org/?map=/etc/mapserver/ecs_test_map_files/mapserver.map';
+const wmsUrlNemac = 'https://mapserver.nemac.org/?map=/etc/mapserver/ecs_test_map_files/';
+const wmsUrl = 'https://fswms-dev.nemac.org/forwarn3?MAPFILE=';
 export const config = {
   wmsUrl: wmsUrl,
-  wmsUrlFull: wmsUrlFull,
   agolApiKey: 'AAPK961d021a9f344f7c95eaadbeb6c6f39ajXC7QTZMufrPPCzqo0NN_ta6FKKzOb8GDutDr1ipDWZMVMPT-Mgy4CNcnKIXJTdu',
-  mapCenter: [36.9517, -82.4588],
-  mapZoom: 7,
+  mapCenter: [34.87, -83.4],
+  mapZoom: 12,
   projectName: 'New FCAV',
   playSpeeds: {
     // in milliseconds
@@ -16,7 +15,7 @@ export const config = {
   wmsLayers: {
     'FW3 1 year': {
       name: 'FW3 1 year',
-      url: wmsUrl.concat('forwarn3_products_1yr.map'),
+      url: wmsUrl.concat('forwarn3_products_1yr'),
       layer_regex: /^forwarn3_products_1yr_(\d{4})(\d{2})(\d{2})$/,
     },
     forwarn3_products_1yr: {
@@ -123,22 +122,27 @@ export const config = {
   vectorLayers: {
     'Current Large Incidents': {
       name: 'Current Large Incidents',
-      url: wmsUrl.concat('fire.map'),
+      url: wmsUrlNemac.concat('fire.map'),
       layerName: 'Current-Large-incidents',
+    },
+    'modis-fire-2022': {
+      name: 'modis-fire-2022',
+      url: wmsUrlNemac.concat('fire.map'),
+      layerName: 'modis-fire-2022',
     },
     'Tropical Cyclone Lines 2022': {
       name: 'Tropical Cyclone Lines 2022',
-      url: wmsUrl.concat('vlayers.map'),
+      url: wmsUrlNemac.concat('vlayers.map'),
       layerName: 'tropical_cyclone_lines_2022',
     },
     'Tropical Cyclone Lines 2023': {
       name: 'Tropical Cyclone Lines 2023',
-      url: wmsUrl.concat('vlayers.map'),
+      url: wmsUrlNemac.concat('vlayers.map'),
       layerName: 'tropical_cyclone_lines_2023',
     },
     'Tropical Cyclone Lines Since 1980': {
       name: 'Tropical Cyclone Lines Since 1980',
-      url: wmsUrl.concat('vector_map_files/tropical_cyclone_lines.map'),
+      url: wmsUrlNemac.concat('vector_map_files/tropical_cyclone_lines.map'),
       layerName: 'tropical_cyclone_lines_since_1980',
     },
   },

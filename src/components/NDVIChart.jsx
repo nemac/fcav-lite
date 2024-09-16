@@ -6,32 +6,30 @@ const NDVIChart = (props) => {
   const [dotsData, setDotsData] = useState([{ x: 0, y: 0 }]);
   const [activeDotPosition, setActiveDotPosition] = useState({ x: 0, y: 0 });
 
-  // if (activeDotPosition != dotsData[activeLayerIndex]) {
-  //   setActiveDotPosition(dotsData[activeLayerIndex]);
-  // }
-
-  useEffect(() => {
+  if (activeDotPosition != dotsData[activeLayerIndex]) {
     setActiveDotPosition(dotsData[activeLayerIndex]);
-  }, [activeLayerIndex]);
+  }
+
+  // useEffect(() => {
+  //   setActiveDotPosition(dotsData[activeLayerIndex]);
+  // }, [activeLayerIndex]);
 
   const getDotsData = () => {
     const dotsList = [];
     const dots = document.querySelectorAll('.recharts-dot');
     if (dots.length) {
       Array.from(dots).map((item) => {
-        dotsList.push({ x: item.getAttribute('cx'), y: item.getAttribute('cy') });
+        dotsList.push({ x: parseInt(item.getAttribute('cx'), 10) * -1, y: parseInt(item.getAttribute('cy'), 10) * -1 });
       });
       setDotsData(dotsList);
-      console.log('animation End');
     }
   };
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
-      console.log(payload);
       return (
         <div className="custom-tooltip">
-          <p className="label">{`${data[activeLayerIndex].name} : ${data[activeLayerIndex].ndvi}`}</p>
+          <p className="label">NDVI : {data[activeLayerIndex].ndvi}</p>
         </div>
       );
     }
@@ -53,7 +51,7 @@ const NDVIChart = (props) => {
           cursor={false}
           isAnimationActive={true}
           active={true}
-          position={{ x: 0 - -1 * activeDotPosition.x, y: -50 - -1 * activeDotPosition.y }}
+          position={{ x: 0 - dotsData[activeLayerIndex].x, y: 0 - dotsData[activeLayerIndex].y }}
         />
         <Legend />
         <Line
