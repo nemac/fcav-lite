@@ -1,448 +1,301 @@
-import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
-import { Marker, MapContainer, Popup, useMap, useMapEvents, WMSTileLayer } from 'react-leaflet';
-import { Box, Paper, Slider } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { IconButton } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import CloseIcon from '@mui/icons-material/Close';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import ShowChartIcon from '@mui/icons-material/ShowChart';
-import styled from '@emotion/styled';
-import { useQuery } from '@tanstack/react-query';
-import XMLParser from 'react-xml-parser';
-import VectorBasemapLayer from 'react-esri-leaflet/plugins/VectorBasemapLayer';
+// App.js
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, LayersControl, ZoomControl } from 'react-leaflet';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Switch,
+  CircularProgress,
+  Box,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  Drawer,
+  IconButton,
+} from '@mui/material';
+import { ImageOutlined, LayersOutlined, Menu as MenuIcon } from '@mui/icons-material';
+import 'leaflet/dist/leaflet.css';
 
-// internal imports
-import BasicSelect from './components/BasicSelect';
-import BasicButton from './components/BasicButton';
-import BasicText from './components/BasicText.jsx';
-import NDVIChart from './components/NDVIChart.jsx';
-import { config } from './config';
-import { webMercatorToLatLng, convertStringToDate, parseDateString, convertDateToString } from './utils.js';
-import NDVIButtonWrapper from './components/NDVIButton.jsx';
+// Import the pre-generated file list
+import { s3FileList } from './s3Files';
 
-export const StyledMapContainer = styled(MapContainer)(() => ({
-  height: '100%',
-  width: '100%',
-}));
+// Base URL for the COG tile service
+const tileServiceBaseUrl =
+  'https://le454ava0m.execute-api.us-east-1.amazonaws.com/cog/tiles/WebMercatorQuad/{z}/{x}/{y}';
+const bucketName = 'efetac-test';
 
-function App() {
-  const [map, setMap] = useState(null);
-  const [ndviData, setNdviData] = useState([]);
-  const [ndviDataSubset, setNdviDataSubset] = useState([]);
-  const [showGraph, setShowGraph] = useState(false);
-  const [popupPosition, setPopupPosition] = useState(null);
-  const [changeProduct, setChangeProduct] = useState(config.wmsLayers['FW3 1 year']);
-  const [mask, setMask] = useState(config.masks['NoMask']);
-  const [overlay, setOverlay] = useState(config.vectorLayers['modis-fire-2022']);
-  const [basemap, setBasemap] = useState(config.basemaps['ArcGIS Imagery']);
-  const [availableLayers, setAvailableLayers] = useState([]);
-  const [activeLayerIndex, setActiveLayerIndex] = useState(0);
-  const [startDate, setStartDate] = useState(dayjs('2024-07-01'));
-  const [endDate, setEndDate] = useState(dayjs('2024-09-01'));
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playSpeed, setPlaySpeed] = useState(config.playSpeeds['2x']);
-  const [unFilteredLayers, setUnfilteredLayers] = useState([]);
-  const intervalRef = React.useRef(null);
-
-  const onSelectedDateChange = (event) => {
-    console.log(event.target.value);
-    setActiveLayerIndex(event.target.value);
-  };
-
-  const startDateChanged = (event) => {
-    const newStartDate = event.$d;
-    setStartDate(newStartDate);
-    const allLayers = [];
-    unFilteredLayers.forEach((layer) => {
-      let date = layer.match(/(\d{4})(\d{2})(\d{2})/);
-      date = convertStringToDate(date[0]);
-      if (date >= newStartDate && date <= endDate) {
-        allLayers.push(layer);
-      }
-    });
-    setAvailableLayers(allLayers);
-
-    // filter ndvi values
-    setNdviDataSubset(
-      ndviData.filter((item) => {
-        const date = convertStringToDate(item.name);
-        return date >= newStartDate && date <= endDate;
-      })
-    );
-  };
-
-  const endDateChanged = (event) => {
-    const newEndDate = event.$d;
-    setEndDate(newEndDate);
-    const allLayers = [];
-    unFilteredLayers.forEach((layer) => {
-      let date = layer.match(/(\d{4})(\d{2})(\d{2})/);
-      date = convertStringToDate(date[0]);
-      if (date >= startDate && date <= newEndDate) {
-        allLayers.push(layer);
-      }
-    });
-    setAvailableLayers(allLayers);
-
-    // filter ndvi values
-    setNdviDataSubset(
-      ndviData.filter((item) => {
-        const date = convertStringToDate(item.name);
-        return date >= startDate && date <= newEndDate;
-      })
-    );
-  };
-
-  const handleChangeProductChange = (event) => {
-    const selectedChangeProduct = config.wmsLayers[event.target.value];
-    setChangeProduct(selectedChangeProduct);
-  };
-
-  const handleMaskChange = (event) => {
-    const selectedMask = event.target.value;
-    setMask(config.masks[selectedMask]);
-  };
-
-  const handleOverlayChange = (event) => {
-    const selectedOverlay = event.target.value;
-    setOverlay(config.vectorLayers[selectedOverlay]);
-  };
-
-  const handleBasemapChange = (event) => {
-    const selectedBasemap = event.target.value;
-    setBasemap(config.basemaps[selectedBasemap]);
-  };
-
-  const NdviChartButton = () => {
-    // const map = useMapEvents({
-    //   click(event) {
-    //     console.log('click');
-    //     if (map.getContainer().style.cursor === 'crosshair') {
-    //       map.getContainer().style.cursor = 'grab';
-    //       setShowGraph(true);
-    //       setPopupPosition([event.latlng.lat, event.latlng.lng]);
-    //     }
-    //   },
-    // });
-    const map = useMap();
-    map.on('click', (e) => {
-      console.log('click', e);
-    });
-    const chartOnClick = (e) => {
-      e.stopPropagation();
-      if (map.getContainer().style.cursor === 'grab') {
-        map.getContainer().style.cursor = 'crosshair';
-        return;
-      }
-      setShowGraph(false);
-      map.getContainer().style.cursor = 'grab';
-    };
-
-    return (
-      <IconButton
-        sx={{ backgroundColor: 'white', zIndex: 1000 }}
-        variant="contained"
-        size="medium"
-        onClick={chartOnClick}
-      >
-        <ShowChartIcon />
-      </IconButton>
-    );
-  };
-
-  const handleIsPlayingPress = (event) => {
-    let currentLayerIndex = activeLayerIndex;
-    if (isPlaying) {
-      // Stop the interval
-      clearInterval(intervalRef.current);
-    } else {
-      // Start the interval
-      intervalRef.current = setInterval(() => {
-        setActiveLayerIndex((currentLayerIndex + 1) % availableLayers.length);
-        currentLayerIndex = currentLayerIndex + 1;
-      }, 3000);
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const { isPending, error, data, isFetching } = useQuery({
-    queryKey: [changeProduct?.url],
-    queryFn: async () => {
-      const response = await fetch(`${changeProduct?.url}&service=WMS&request=GetCapabilities`);
-      const xmlText = await response.text();
-      const xml = new XMLParser().parseFromString(xmlText);
-      return xml;
-    },
-    enabled: !!changeProduct?.url,
+const S3Explorer = () => {
+  // Combine state into a single state object to reduce useState calls
+  const [state, setState] = useState({
+    loading: true,
+    drawerOpen: true,
+    selectedDisplay: 'list',
+    files: [],
+    selectedLayers: {},
   });
 
-  if (isPending) {
-    console.log('isPending');
-  }
-  if (error) {
-    console.log('An error has occurred: ' + error.message);
-  }
-
-  // Update available layers when the getCapabilities query has returned
+  // Initialize on mount
   useEffect(() => {
-    if (!data) return;
-    const layers = data?.getElementsByTagName('Layer');
-    const queryableLayers = layers.filter((layer) => layer.attributes.queryable === '1');
-    const availableLayers = [];
-    const allLayers = [];
-    // const layerConfig = config.wmsLayers.find(layer => layer.name === layerName);
-    queryableLayers.forEach((layer) => {
-      const layerName = layer.getElementsByTagName('Name')[0]?.value;
-      if (changeProduct.layer_regex.test(layerName)) {
-        allLayers.push(layerName);
-        let date = layerName.match(/(\d{4})(\d{2})(\d{2})/);
-        date = convertStringToDate(date[0]);
-        if (date >= startDate && date <= endDate) {
-          availableLayers.push(layerName);
-        }
-      }
+    // Initialize from pre-generated file list
+    const files = s3FileList;
+
+    // Create a map of files to their selection state (all initially false)
+    const selectedLayers = files.reduce((acc, file) => {
+      acc[file] = false;
+      return acc;
+    }, {});
+
+    setState((prevState) => ({
+      ...prevState,
+      files,
+      selectedLayers,
+      loading: false,
+    }));
+  }, []);
+
+  // Toggle layer visibility - now updates active count within the same state update
+  const handleLayerToggle = (file) => {
+    setState((prevState) => {
+      const newSelectedLayers = {
+        ...prevState.selectedLayers,
+        [file]: !prevState.selectedLayers[file],
+      };
+
+      return {
+        ...prevState,
+        selectedLayers: newSelectedLayers,
+      };
     });
-    console.log('jeff available', availableLayers);
-    setAvailableLayers(availableLayers);
-    setUnfilteredLayers(allLayers);
-  }, [data]);
+  };
 
-  // Extract coordinates from the extent
-  const minX = -10268395.80449;
-  const minY = 2407154.1657405;
-  const maxX = -7920250.29557;
-  const maxY = 3445474.7579661;
-  // Calculate lat/lng for each corner
-  const southWest = webMercatorToLatLng(minX, minY);
-  const northWest = webMercatorToLatLng(minX, maxY);
-  const northEast = webMercatorToLatLng(maxX, maxY);
-  const southEast = webMercatorToLatLng(maxX, minY);
+  // Helper function to get active layer count
+  const getActiveLayerCount = () => {
+    return Object.values(state.selectedLayers).filter(Boolean).length;
+  };
 
-  // Calculate the center
-  const centerLat = (southWest[0] + northWest[0] + northEast[0] + southEast[0]) / 4;
-  const centerLng = (southWest[1] + northWest[1] + northEast[1] + southEast[1]) / 4;
+  // Generate TileLayer URL for a specific file
+  const generateTileLayerUrl = (filePath) => {
+    const s3Url = `https://${bucketName}.s3.us-east-1.amazonaws.com/${filePath}`;
+    const encodedS3Url = encodeURIComponent(s3Url);
+
+    // Base parameters - can be customized based on file type/needs
+    return `${tileServiceBaseUrl}?url=${encodedS3Url}`;
+  };
+
+  const toggleDrawer = () => {
+    setState((prevState) => ({
+      ...prevState,
+      drawerOpen: !prevState.drawerOpen,
+    }));
+  };
+
+  const handleDisplayChange = (e) => {
+    setState((prevState) => ({
+      ...prevState,
+      selectedDisplay: e.target.value,
+    }));
+  };
+
+  const activeLayerCount = getActiveLayerCount();
+  const { loading, drawerOpen, selectedDisplay, files, selectedLayers } = state;
 
   return (
-    <Grid
-      container
-      spacing={2}
-      p={1}
-      sx={{ height: '100%' }}
-    >
-      <Grid
-        xs={12}
-        lg={3}
+    <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
-        <BasicSelect
-          value={changeProduct.name}
-          label={'Change Product'}
-          selectionList={Object.keys(config.wmsLayers)}
-          handleChange={handleChangeProductChange}
-        />
-      </Grid>
-      <Grid
-        xs={12}
-        lg={3}
-      >
-        <BasicSelect
-          value={mask.name}
-          label={'Mask'}
-          selectionList={Object.keys(config.masks)}
-          handleChange={handleMaskChange}
-        />
-      </Grid>
-      <Grid
-        xs={12}
-        lg={3}
-      >
-        <BasicSelect
-          value={overlay.name}
-          label={'Overlay'}
-          selectionList={Object.keys(config.vectorLayers)}
-          handleChange={handleOverlayChange}
-        />
-      </Grid>
-      <Grid
-        xs={12}
-        lg={3}
-      >
-        <BasicSelect
-          value={basemap.name}
-          label={'Base Map'}
-          selectionList={Object.keys(config.basemaps)}
-          handleChange={handleBasemapChange}
-        />
-      </Grid>
-      <Grid
-        xs={12}
-        lg={2}
-      >
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            value={startDate}
-            label="Start Date"
-            onChange={(event) => startDateChanged(event)}
-          />
-        </LocalizationProvider>
-      </Grid>
-      <Grid
-        xs={12}
-        lg={5}
-      >
-        <Slider
-          aria-label="Date"
-          // slots={{valueLabel: ValueLabelComponent}}
-          onChange={(event) => onSelectedDateChange(event)}
-          value={activeLayerIndex}
-          step={1}
-          marks
-          min={0}
-          max={availableLayers.length - 1}
-        />
-      </Grid>
-      <Grid
-        xs={12}
-        lg={2}
-      >
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            value={endDate}
-            label="End Date"
-            onChange={(event) => endDateChanged(event)}
-          />
-        </LocalizationProvider>
-      </Grid>
-      <Grid
-        xs={12}
-        lg={1}
-      >
-        <BasicButton
-          icon={isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-          label={isPlaying ? 'Pause' : 'Animate'}
-          onClick={(event) => handleIsPlayingPress(event)}
-        />
-      </Grid>
-      <Grid
-        xs={12}
-        sx={{ height: '100%', width: '100%' }}
-      >
-        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ height: '80%', transition: 'flex 0.3s ease-in-out' }}>
-            <StyledMapContainer
-              ref={setMap}
-              id="map-container"
-              center={config.mapCenter}
-              zoom={config.mapZoom}
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={toggleDrawer}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1 }}
+          >
+            S3 GeoTIFF Explorer - {bucketName}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <LayersOutlined />
+            <Typography
+              variant="body1"
+              sx={{ ml: 1, mr: 2 }}
             >
-              <link
-                rel="stylesheet"
-                href="https://unpkg.com/leaflet@latest/dist/leaflet.css"
-              />
-              <WMSTileLayer
-                key={overlay.name}
-                url={overlay.url}
-                layers={overlay.layerName}
-                format="image/png"
-                transparent={true}
-                uppercase={true}
-                opacity={100}
-                zIndex={100}
-                // time={'2022-01-01 00:00:00/2023-12-31 00:00:00'}
-              />
-              {availableLayers.map((layer, index) => (
-                <WMSTileLayer
-                  key={layer + mask.name}
-                  url={changeProduct.url}
-                  layers={layer}
-                  format="image/png"
-                  transparent={true}
-                  uppercase={true}
-                  mask={mask.name}
-                  opacity={index === activeLayerIndex ? 1 : 0}
-                />
-              ))}
-              {/*<WMSTileLayer*/}
-              {/*  key={availableLayers[activeLayerIndex] + mask}*/}
-              {/*  url={changeProduct.url}*/}
-              {/*  layers={availableLayers[activeLayerIndex]}*/}
-              {/*  format="image/png"*/}
-              {/*  transparent={true}*/}
-              {/*  uppercase={true}*/}
-              {/*  mask={mask.name}*/}
-              {/*/>*/}
-              {/*<div className="leaflet-top leaflet-left" style={{ top: '90px' }}>*/}
-              {/*  <div className="leaflet-control leaflet-bar">*/}
-              {/*    <NdviChartButton />*/}
-              {/*  </div>*/}
-              {/*</div>*/}
-              <div
-                className="leaflet-bottom leaflet-left"
-                style={{ bottom: '10px', left: '20px' }}
-              >
-                <div className="leaflet-control leaflet-bar">
-                  <BasicText text={availableLayers[activeLayerIndex]} />
-                </div>
-              </div>
-              <div
-                className="leaflet-bottom leaflet-right"
-                style={{ bottom: '10px', right: '20px' }}
-              >
-                <div className="leaflet-control leaflet-bar">
-                  <BasicText text={overlay.name} />
-                </div>
-              </div>
-              <VectorBasemapLayer
-                key={basemap.basemap}
-                name={basemap.basemap}
-                token={config.agolApiKey}
-              />
-              {/*<NDVIButtonWrapper*/}
-              {/*  popupPosition={popupPosition}*/}
-              {/*  startDate={startDate}*/}
-              {/*  endDate={endDate}*/}
-              {/*  setPopupPosition={setPopupPosition}*/}
-              {/*  setShowGraph={setShowGraph}*/}
-              {/*  setNdviData={setNdviData}*/}
-              {/*  setNdviDataSubset={setNdviDataSubset}*/}
-              {/*/>*/}
-              {showGraph && <Marker position={popupPosition} />}
-            </StyledMapContainer>
+              {activeLayerCount} layer{activeLayerCount !== 1 ? 's' : ''} active
+            </Typography>
           </Box>
-          {showGraph && (
-            <Box sx={{ height: '100%', width: '100%', zIndex: 100 }}>
-              <Grid
-                container
-                spacing={2}
-              >
-                {/*<Grid>*/}
-                {/*</Grid>*/}
-                <NDVIChart
-                  data={ndviDataSubset}
-                  activeLayerIndex={activeLayerIndex}
-                />
+          <FormControl
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 120, backgroundColor: 'rgba(255,255,255,0.1)' }}
+          >
+            <Select
+              value={selectedDisplay}
+              onChange={handleDisplayChange}
+              sx={{ color: 'white' }}
+            >
+              <MenuItem value="list">List View</MenuItem>
+              <MenuItem value="grid">Grid View</MenuItem>
+            </Select>
+          </FormControl>
+        </Toolbar>
+      </AppBar>
 
-                <Grid>
-                  <IconButton
-                    aria-label="close"
-                    onClick={() => {
-                      setShowGraph(false);
-                    }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </Grid>
-              </Grid>
+      <Drawer
+        variant="persistent"
+        anchor="left"
+        open={drawerOpen}
+        sx={{
+          width: 350,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: 350,
+            boxSizing: 'border-box',
+            marginTop: '64px',
+            height: 'calc(100% - 64px)',
+          },
+        }}
+      >
+        <Box sx={{ overflow: 'auto', p: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{ mb: 2 }}
+          >
+            Available Layers ({files.length})
+          </Typography>
+
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
             </Box>
+          ) : selectedDisplay === 'list' ? (
+            <List>
+              {files.map((file, index) => (
+                <ListItem
+                  key={index}
+                  sx={{ border: '1px solid #eee', mb: 1, borderRadius: 1 }}
+                >
+                  <ListItemIcon>
+                    <ImageOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={file.split('/').pop()}
+                    secondary={file}
+                    primaryTypographyProps={{
+                      noWrap: true,
+                      style: { fontWeight: selectedLayers[file] ? 'bold' : 'normal' },
+                    }}
+                    secondaryTypographyProps={{ noWrap: true }}
+                  />
+                  <Switch
+                    edge="end"
+                    checked={selectedLayers[file] || false}
+                    onChange={() => handleLayerToggle(file)}
+                    inputProps={{ 'aria-labelledby': `layer-${index}` }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Grid
+              container
+              spacing={2}
+            >
+              {files.map((file, index) => (
+                <Grid
+                  item
+                  xs={6}
+                  key={index}
+                >
+                  <Paper
+                    elevation={selectedLayers[file] ? 8 : 1}
+                    sx={{
+                      p: 2,
+                      textAlign: 'center',
+                      border: selectedLayers[file] ? '2px solid #3f51b5' : '1px solid #eee',
+                      cursor: 'pointer',
+                      height: '100%',
+                    }}
+                    onClick={() => handleLayerToggle(file)}
+                  >
+                    <ImageOutlined
+                      sx={{ fontSize: 40, mb: 1, color: selectedLayers[file] ? '#3f51b5' : 'text.secondary' }}
+                    />
+                    <Typography
+                      noWrap
+                      variant="body2"
+                    >
+                      {file.split('/').pop()}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
           )}
         </Box>
-      </Grid>
-    </Grid>
-  );
-}
+      </Drawer>
 
-export default App;
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 0,
+          width: drawerOpen ? 'calc(100% - 350px)' : '100%',
+          height: '100%',
+          mt: '64px',
+        }}
+      >
+        <MapContainer
+          center={[35.78, -80.79]} // Centered on North Carolina
+          zoom={7}
+          style={{ height: '100%', width: '100%' }}
+          zoomControl={false}
+        >
+          <ZoomControl position="bottomright" />
+
+          {/* Base map layer */}
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+
+          {/* Dynamic layers from S3 */}
+          <LayersControl position="topright">
+            {Object.entries(selectedLayers).map(
+              ([file, isSelected], index) =>
+                isSelected && (
+                  <LayersControl.Overlay
+                    key={index}
+                    checked={true}
+                    name={file.split('/').pop()}
+                  >
+                    <TileLayer
+                      url={generateTileLayerUrl(file)}
+                      attribution={`Data from ${bucketName}: ${file}`}
+                    />
+                  </LayersControl.Overlay>
+                )
+            )}
+          </LayersControl>
+        </MapContainer>
+      </Box>
+    </Box>
+  );
+};
+
+export default S3Explorer;
